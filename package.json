@@ -1,0 +1,20 @@
+{
+  "name": "Burritobot",
+  "version": "1.0.0",
+  "description": "Just tryna make a bot for a server",
+  "main": "bot.js",
+  "author": "Burrito119",
+  "dependencies": {
+    "@discordjs/uws": "^11.149.1",
+    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+    "discord.js": "^11.4.2",
+    "jimp": "^0.6.1",
+    "log-timestamp": "^0.3.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "license": "ISC"
+}
