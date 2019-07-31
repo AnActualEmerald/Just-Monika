@@ -1,6 +1,6 @@
 module.exports = {
     name: 'setwelcomechannel',
-    alias: ['setwc'],
+    alias: ['setwc', 'welcomechannel'],
     args: false,
     description: 'Sets where the channel that the bot sends welcome messages to',
     usage: '',

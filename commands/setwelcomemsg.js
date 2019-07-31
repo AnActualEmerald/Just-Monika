@@ -2,8 +2,8 @@ module.exports = {
 		name:'setwelcomemsg',
 		admin:true,
 		args:true,
-		alias:[],
-		description:'Changes the server\'s welcome message',
+		alias:['setwmsg', 'welcomemsg'],
+		description:'Changes the server\'s welcome message. Use <@${user.id}> to mention the new uers. Or, use &{user.username} to just display their name and not mention them.',
 		usage:'<text>',
 		execute(message, args, bot){
 			var msg = args.toString().replace(/,/g, ' ');

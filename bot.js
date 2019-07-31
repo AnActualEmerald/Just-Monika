@@ -53,14 +53,14 @@ String.prototype.interpolate = function(params) {
 
 
 bot.on('ready',  () => {
-	
+
 	loadCmds();
-	
+
 	console.log('Timestamp is 5 hours ahead');
 	console.log('Bot\'s up and running');
-	
+
 	bot.user.setActivity(bot.globalVar.activity);
-	
+
 });
 
 //emojis
@@ -69,12 +69,12 @@ var thumbsdown = '👎';
 
 
 bot.on('guildMemberAdd', member => {
-	
+
 	const guildName = member.guild.id;
 	const channelName = bot.myGuilds[guildName].welcomeChannel;
 	const welcomeMsg = bot.myGuilds[guildName].welcomeMessage;
 	var channel;
-	
+
 	try{
 		if(config.debug) console.log(`guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`)
 	    channel = member.guild.channels.find('name', channelName);
@@ -82,10 +82,10 @@ bot.on('guildMemberAdd', member => {
 		console.log(`Couldn't get channel ${channelName}`);
 		console.error(err);
 	}
-	
-	
-	const result = welcomeMsg.interpolate({user:member.user.username});
-	
+
+
+	const result = welcomeMsg.interpolate({user:member.user});
+
 	if(channel)
 	{
 		channel.send(result);
@@ -93,20 +93,20 @@ bot.on('guildMemberAdd', member => {
 });
 
 bot.on('guildCreate', guild => {
-	bot.myGuilds[guild.id] = {'name':guild.name,'welcomeChannel':'general','welcomeMessage':'Welcome to the server, ${user}'};
+	bot.myGuilds[guild.id] = {'name':guild.name,'welcomeChannel':'general','welcomeMessage':'Welcome to the server, <@${user.id}>'};
 	updateJSON(guildFile, bot.myGuilds);
-	guild.owner.send(`Hey there, I just joined you server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use ${bot.prefix}help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. You can change this and the message I send using ${bot.prefix}welcomechannel and ${bot.prefix}welcomemsg. I look forward to memeing with you!`);
-	
+	guild.owner.send(`Hey there, I just joined your server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use ${bot.prefix}help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. You can change this and the message I send using ${bot.prefix}welcomechannel and ${bot.prefix}welcomemsg. I look forward to memeing with you!`);
+
 });
 
 bot.on('message', message => {
-	
-	
+
+
 	if(message.channel.type === 'dm')
 	{
 		return handleDM(message);
 	}
-	
+
 	if(!bot.userVars[message.author]){
 		bot.userVars[message.author] = 0;
 	}
@@ -114,21 +114,21 @@ bot.on('message', message => {
 	bot.userVars[message.author] = parseInt(bot.userVars[message.author]) + 1;
 
 	updateJSON(usersFile, bot.userVars);
-	
+
 	if(message.author.bot)
 			return;
 
 	//listen for commands starting with the prefix
 	if(message.content.startsWith(bot.prefix)){
 		console.log("Command string: " + message.content);
-		
+
 		const args = message.content.slice(bot.prefix.length).split(/ +/);
 		const cmdName = args.shift().toLowerCase();
-		
+
 		console.log(args);
-/* 		
-	
-		
+/*
+
+
 		if(cmdName == "reload"){
 			if(!message.member.hasPermission('ADMINISTRATOR')){
 				message.reply('you don\'t have permission to use this command');
@@ -136,31 +136,31 @@ bot.on('message', message => {
 			}else{
 				loadCmds();
 				return message.channel.send({embed:{description:"Reloaded all commands"}});
-				
+
 			}
 		} */
-	
-			const com = bot.commands.get(cmdName) 
+
+			const com = bot.commands.get(cmdName)
 				|| bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
-				
-			
+
+
 			if(bot.customComs.has(cmdName))
 				return message.channel.send(bot.customComs.get(cmdName));
-			
+
 			if(!com){
 				return message.channel.send("No such command, sorry");
 			}
-				
+
 			if(com.args && !args.length)
 			{
 				return message.channel.send(`The proper usage is \'${bot.prefix}${com.name} ${com.usage}\'`);
 			}
-			
+
 			if(com.admin && !message.member.hasPermission('ADMINISTRATOR'))
 			{
 				return message.channel.send(`This command is admin only, ${message.author}`);
 			}
-			
+
 			if(com.cooldown)
 			{
 				if(bot.coolDowns.get(message.member.id) == com.name)
@@ -178,13 +178,13 @@ bot.on('message', message => {
 				console.log(e);
 				message.channel.send("Had trouble with that command, check the logs");
 			}
-			
+
 		}
-			
+
 
 		for(var s in bot.sayings)
 		{
-			var cont = message.content			
+			var cont = message.content
 			if(!bot.sayings[s].sens){
 				cont= cont.toLowerCase();
 			}
@@ -193,8 +193,8 @@ bot.on('message', message => {
 				message.channel.send(bot.sayings[s].text);
 			}
 		}
-		
-		
+
+
 	updateJSON(varFile, bot.globalVar);
 	updateJSON(sayingsFile, bot.sayings);
 	updateJSON(guildFile, bot.myGuilds);
@@ -235,9 +235,9 @@ function updateJSON(fileName, data, cooked){
 }
 
 function loadCmds(message){
-	
+
 	const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-	
+
 	for (const file of commandFiles) {
 		try{
 			delete require.cache[require.resolve(`./commands/${file}`)];
@@ -248,12 +248,12 @@ function loadCmds(message){
 			if(message) message.channel.send(`There was an error with loading ${file}`);
 		}
 	}
-	
+
 	delete require.cache[require.resolve(ccFile)];
 	ccF = require(ccFile);
-	
+
 	bot.customComs = bot.JSONtoCollection(ccF);
-	
+
 }
 
 function handleDM(message){
@@ -263,20 +263,20 @@ function handleDM(message){
 bot.collectionToJSON = function(collection){
 	var obj = {};
 	var keys = collection.keyArray();
-	
+
 	for(var i = 0; i < keys.length; i++){
 		var val = collection.get(keys[i]);
 		obj[keys[i]] = val;
 	}
-	
+
 	if(config.debug) console.log("bot.collectionToJSON returned: "+obj);
-	
+
 	return obj;
 }
 
 function JSONtoCollection(obj){
 	var coll = new Discord.Collection();
-	
+
 	for(var key in obj)
 	{
 		if(obj.hasOwnProperty(key)){
