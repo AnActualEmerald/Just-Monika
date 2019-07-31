@@ -1,3 +1,7 @@
 node_modules
 ./node_modules
 config.json
+users.json
+guilds.json
+guilds.json
+users.json
