@@ -7,7 +7,7 @@ module.exports = {
 		var data = [];
 		if(!args.length)
 		{
-	
+
 			data.push('Here\'s a list of all my commands:');
 			data.push(bot.commands.map(command => command.name).join(',\n'));
 			data.push(`\nYou can send \`${bot.prefix}help [command name]\` to get info on a specific command!`);
@@ -22,17 +22,17 @@ module.exports = {
 				message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
 			});
 		}
-		
+
 		const com = bot.commands.get(args[0]);
 		data.push(`Info about ${com.name}`);
 		data.push(`Usage: ${bot.prefix}${com.name} ${com.usage}`);
 		data.push(`Aliases: ${com.alias}`);
-		
+
 		if(com.cooldown)
 			data.push(`Cool-down: ${com.cooldown/1000}s`);
-		
+
 		data.push(`${com.description}`);
-		
+
 		return message.author.send(data, {split: true})
 			.then(() => {
 			if (message.channel.type === 'dm') return;
@@ -43,5 +43,5 @@ module.exports = {
 				message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
 		});
 	},
-	
+
 };
