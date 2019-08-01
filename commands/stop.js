@@ -9,11 +9,11 @@ module.exports = {
 			reutrn;
 		}else{
 			message.channel.send("Stopping bot");
-			console.log('stop requested by ' + message.author.username);
+			bot.logger.info('stop requested by ' + message.author.username);
 			bot.destroy();
-		
+
 		}
 	},
-	
-	
+
+
 };

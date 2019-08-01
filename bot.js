@@ -1,6 +1,7 @@
 var Discord = require('discord.js');
 var fs = require('fs');
 var stamp = require('log-timestamp');
+var Winston = require('winston');
 
 //file locations
 const guildFile = './guilds.json';
@@ -14,6 +15,10 @@ const ccFile = './commands/customCommands.json';
 var config = require(configFile);
 var ccF = require(ccFile);
 
+//logging format
+const myFormat = Winston.format.printf(({ level, message, timestamp }) => {
+  return `${timestamp} ${level}: ${message}`;
+});
 
 //command variables
 var goodBooks = ["Stormlight Archive by Brandon Sanderson", "Mistborn trilogy by Brandon Sanderson", "Wheel of Time by Robert Jordan"];
@@ -42,6 +47,34 @@ bot.updateJSON = updateJSON;
 bot.loadCmds = loadCmds;
 bot.ccFile = ccFile;
 
+//set up logging
+bot.logger = Winston.createLogger({
+    level: config.winston_lvl,
+    format: Winston.format.combine(
+        Winston.format.timestamp(),
+        Winston.format.prettyPrint(),
+        Winston.format.label({lebel:'logging'}),
+        myFormat
+    ),
+    transports: [
+        new Winston.transports.Console(),
+        new Winston.transports.File({filename:'info.log'}),
+    ]
+});
+
+var netLog = Winston.createLogger({
+    format: Winston.format.combine(
+        Winston.format.timestamp(),
+        Winston.format.prettyPrint(),
+        Winston.format.label({lebel:'logging'}),
+        myFormat
+    ),
+    transports:[
+        new Winston.transports.File({filename:'network.log'})
+    ]
+});
+
+
 //a little snippet taken from stack exchange (thanks Mateusz Moska)
 String.prototype.interpolate = function(params) {
   const names = Object.keys(params);
@@ -56,8 +89,7 @@ bot.on('ready',  () => {
 
 	loadCmds();
 
-	console.log('Timestamp is 5 hours ahead');
-	console.log('Bot\'s up and running');
+	bot.logger.info('Bot start');
 
 	bot.user.setActivity(bot.globalVar.activity);
 
@@ -76,11 +108,11 @@ bot.on('guildMemberAdd', member => {
 	var channel;
 
 	try{
-		if(config.debug) console.log(`guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`)
+		bot.logger.debug(`guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`)
 	    channel = member.guild.channels.find('name', channelName);
 	}catch(err){
-		console.log(`Couldn't get channel ${channelName}`);
-		console.error(err);
+		bot.logger.error(`Couldn't get channel ${channelName}`);
+		bot.logger.error(err);
 	}
 
 
@@ -120,12 +152,12 @@ bot.on('message', message => {
 
 	//listen for commands starting with the prefix
 	if(message.content.startsWith(bot.prefix)){
-		console.log("Command string: " + message.content);
+		bot.logger.info("Command string: " + message.content);
 
 		const args = message.content.slice(bot.prefix.length).split(/ +/);
 		const cmdName = args.shift().toLowerCase();
 
-		console.log(args);
+		bot.logger.debug(args);
 /*
 
 
@@ -201,21 +233,22 @@ bot.on('message', message => {
 });
 
 bot.on('disconnect', event =>{
-	console.log("Websocket disconnected, code: " + event.code);
-	console.log(event.reason);
+	bot.logger.error("Websocket disconnected, code: " + event.code);
+	bot.logger.error(event.reason);
 	bot.destroy();
 	bot.login(config.token);
 });
 
 bot.on('resume', replayed => {
 	//may not be necessary but I'm going to do this anyways
-	bot.user.setActivity(bot.globalVar.activity)
+    bot.logger.warn('Resuming bot');
+	bot.user.setActivity(bot.globalVar.activity);
 });
 
 
 bot.on('debug', info => {
-	if(config.debug)
-		console.log(info);
+	netLog.info(info); //only logs to the network.log file
+    bot.logger.verbose(info);
 });
 //functions
 
@@ -226,9 +259,9 @@ function updateJSON(fileName, data, cooked){
 
 	fs.writeFile(fileName, data, function(err){
 		if(err){
-			console.log('Error saving to JSON file');
-			console.log(fileName);
-			console.log(err);
+			bot.logger.error('Error saving to JSON file');
+			bot.logger.error(fileName);
+			bot.logger.error(err);
 		}
 	});
 
@@ -244,7 +277,7 @@ function loadCmds(message){
 			const command = require(`./commands/${file}`);
 			bot.commands.set(command.name, command);
 		}catch(e){
-			console.log(e);
+			bot.logger.error(e);
 			if(message) message.channel.send(`There was an error with loading ${file}`);
 		}
 	}
@@ -269,7 +302,7 @@ bot.collectionToJSON = function(collection){
 		obj[keys[i]] = val;
 	}
 
-	if(config.debug) console.log("bot.collectionToJSON returned: "+obj);
+	bot.logger.debug("bot.collectionToJSON returned: "+obj);
 
 	return obj;
 }

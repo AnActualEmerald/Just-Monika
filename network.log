@@ -1,0 +1,23 @@
+undefined info: [ws] [connection] Sending a heartbeat
+undefined info: [ws] [connection] Heartbeat acknowledged, latency of 2311ms
+undefined info: [ws] [connection] Sending a heartbeat
+undefined info: [ws] [connection] Heartbeat acknowledged, latency of 55ms
+undefined info: [ws] [connection] Sending a heartbeat
+undefined info: [ws] [connection] Heartbeat acknowledged, latency of 48ms
+2019-08-01T14:58:30.927Z info: Authenticated using token NTQzMzA3MjA0NjQ0NzAwMTcw.Dz9g6w.WJfdW8ir1f9DQA49oqd34myA_M0
+2019-08-01T14:58:31.257Z info: Using gateway wss://gateway.discord.gg/?v=6&encoding=json
+2019-08-01T14:58:31.384Z info: [ws] [connection] Connecting to wss://gateway.discord.gg/?v=6&encoding=json
+2019-08-01T14:58:31.594Z info: [ws] [connection] Connected to gateway wss://gateway.discord.gg/?v=6&encoding=json
+2019-08-01T14:58:31.596Z info: [ws] [connection] Identifying as a new session
+2019-08-01T14:58:31.612Z info: [ws] [connection] Setting a heartbeat interval for 41250ms
+2019-08-01T14:58:31.706Z info: [ws] [connection] Sending a heartbeat
+2019-08-01T14:58:31.716Z info: READY ["gateway-prd-main-hbsd",{"micros":47062,"calls":["discord-sessions-prd-1-9",{"micros":42878,"calls":["start_session",{"micros":15872,"calls":["api-prd-main-9snr",{"micros":9598,"calls":["get_user",{"micros":2667},"add_authorized_ip",{"micros":5},"get_guilds",{"micros":2056},"coros_wait",{"micros":1}]}]},"guilds_connect",{"micros":3,"calls":[]},"presence_connect",{"micros":1770,"calls":[]}]}]}] 481a5d7d63ff42709985a1b8b8816544
+2019-08-01T14:58:32.814Z info: [ws] [connection] Heartbeat acknowledged, latency of 1107ms
+2019-08-01T14:59:12.867Z info: [ws] [connection] Sending a heartbeat
+2019-08-01T14:59:12.913Z info: [ws] [connection] Heartbeat acknowledged, latency of 42ms
+2019-08-01T14:59:54.128Z info: [ws] [connection] Sending a heartbeat
+2019-08-01T14:59:54.175Z info: [ws] [connection] Heartbeat acknowledged, latency of 46ms
+2019-08-01T15:00:35.387Z info: [ws] [connection] Sending a heartbeat
+2019-08-01T15:00:35.445Z info: [ws] [connection] Heartbeat acknowledged, latency of 56ms
+2019-08-01T15:01:16.647Z info: [ws] [connection] Sending a heartbeat
+2019-08-01T15:01:16.745Z info: [ws] [connection] Heartbeat acknowledged, latency of 96ms

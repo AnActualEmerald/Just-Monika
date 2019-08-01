@@ -5,6 +5,6 @@ module.exports = {
 	execute(msg, args, client){
 		var globalVar = require('./cmdVars.json');
 		globalVar.burritosEaten = (parseInt(globalVar.burritosEaten) + 1);
-		msg.channel.send('OM NOM NOM tasty burrito. I\'ve eaten ' + globalVar.burritosEaten + ' burritos').catch(console.err);
+		msg.channel.send('OM NOM NOM tasty burrito. I\'ve eaten ' + globalVar.burritosEaten + ' burritos').catch(bot.logger.error);
 	},
 };

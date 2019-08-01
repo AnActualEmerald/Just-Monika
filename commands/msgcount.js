@@ -6,12 +6,12 @@ module.exports = {
 	execute(message, args, bot)
 	{
 		if(args.length != 0){
-			if(bot.config.debug) console.log(`command msgcount: `);
-			
+			bot.logger.debug(`command msgcount: `);
+
 			message.channel.send(args +  ' has sent ' + bot.userVars[args] + ' messages').catch(console.err);
 		}else{
 			message.channel.send(message.author +  ' you\'ve sent ' + bot.userVars[message.author] + ' messages').catch(console.err);
 		}
 	},
-	
+
 };

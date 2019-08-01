@@ -8,9 +8,9 @@ module.exports = {
 		execute(message, args, bot){
 			var msg = args.toString().replace(/,/g, ' ');
 			var guildName = message.member.guild.id;
-			if(bot.config.debug) console.log("Guild name: " + guildName);
+			bot.logger.debug("Guild name: " + guildName);
 			var strGuilds = JSON.stringify(bot.myGuilds);
-			if(bot.config.debug) console.log(`bot.guilds ${strGuilds}`);
+			bot.logger.debug(`bot.guilds ${strGuilds}`);
 			bot.myGuilds[guildName].welcomeMessage = msg;
 
 			message.channel.send(`Set welcome message to ${bot.myGuilds[guildName].welcomeMessage}`);

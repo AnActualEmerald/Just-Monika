@@ -16,16 +16,15 @@ Promise.all([jimp.read(orgFile),
 			jimp.loadFont(FNT_32),//jimp.FONT_SANS_32_BLACK),
 			jimp.loadFont(FNT_64)])//jimp.FONT_SANS_64_BLACK)])
 			.then((values) => {
-				console.log('This code ran');
 				orgImage = values[0];
 				smallF = values[1];
 				middleF = values[2];
 				largeF = values[3];
-				
+
 			})
 			.catch((err) => {
 				console.log("There was a problem loading the fonts");
-				console.error(err);
+				console.log(err);
 			});
 
 module.exports = {
@@ -42,46 +41,46 @@ module.exports = {
 		var caption = args.toString().replace(/,/g, ' ');
 		var editedFile = './commands/res/ScorchTmp.jpg'
 		var font;
-		if(bot.config.debug) console.log(caption);
+		bot.logger.debug(`Caption: ${caption}`);
 		var len = jimp.measureText(middleF, caption);
 		if(len >= 1200)
 		{
 			font = smallF;
-			console.log("len s: " + len);
+			bot.logger.debug("len s: " + len);
 		}else if(len <= 400)
 		{
 			font = largeF;
-			console.log("len l: " + len);
+			bot.logger.debug("len l: " + len);
 		}else{
 			font = middleF;
-			console.log("len m: " + len);
+			bot.logger.debug("len m: " + len);
 		}
-		 
+
 		jimp.read('./commands/res/scorch.jpg')
 			.then(function(image){
 				loadedImg = image;
 				//try{
-					loadedImg.print(font, 
-					defX, 
+					loadedImg.print(font,
+					defX,
 					defY,
-					{ 
+					{
 						text:caption,
 						alignmentX: jimp.HORIZONTAL_ALIGN_CENTER,
 						alignmentY: jimp.VERTICAL_ALIGN_TOP
 					},
 					300).write(editedFile);
-				
+
 					message.channel.stopTyping(true);
 					message.channel.send({files:[editedFile]});
 					delete loadedImage;
-					console.log("sent the image");
+					bot.logger.info("sent the image");
 			})
 				.catch((err) => {
-					console.error(err);
+					bot.logger.error(err);
 					message.channel.send("Couldn't process the image, check the logs");
 					messag.channel.stopTyping(true);
 				});
-		
+
 		message.channel.stopTyping(true);
 	},
 };

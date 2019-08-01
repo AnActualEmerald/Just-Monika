@@ -11,8 +11,8 @@ module.exports = {
 			bot.loadCmds(message);
 			message.channel.send({embed:{description:'Reloaded all commands'}});
 		}catch(err){
-			console.log(`Couldn't reload commands`)
-			console.error(err);
+			bot.logger.error(`Couldn't reload commands`)
+			bot.logger.error(err);
 		}
 	},
 };

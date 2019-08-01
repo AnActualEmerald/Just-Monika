@@ -9,9 +9,9 @@ module.exports = {
 		var userID = args.shift().replace('<@', '').replace('!', '').replace('>', '');
 		var user = message.member.guild.members.get(userID);
 		var reason = args.toString().replace(/,/g, ' ');
-		
+
 		user.kick(reason)
 			.then(() => message.channel.send(`Kicked <@${userID}> for \`${reason}\``))
-			.catch((err) => {console.error(`Error kicking ${user.user.username}: ${err}`); message.channel.send(`COULD'T KICK <@${userID}>, THEY'RE TOO POWERFUL`)});
+			.catch((err) => {bot.logger.error(`Error kicking ${user.user.username}: ${err}`); message.channel.send(`COULD'T KICK <@${userID}>, THEY'RE TOO POWERFUL`)});
 	},
 };

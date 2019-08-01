@@ -5,6 +5,6 @@ module.exports = {
 	description: 'Thumbs up, bruh',
 	args: false,
 	execute(message, args, bot){
-		message.react(thumbsup).catch(console.err);
+		message.react(thumbsup).catch(bot.logger.error);
 	},
 };
