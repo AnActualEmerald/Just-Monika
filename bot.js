@@ -1,6 +1,6 @@
 var Discord = require('discord.js');
 var fs = require('fs');
-var stamp = require('log-timestamp');
+//var stamp = require('log-timestamp');
 var Winston = require('winston');
 
 //file locations
@@ -16,8 +16,8 @@ var config = require(configFile);
 var ccF = require(ccFile);
 
 //logging format
-const myFormat = Winston.format.printf(({ level, message, timestamp }) => {
-  return `${timestamp} ${level}: ${message}`;
+const myFormat = Winston.format.printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
 //command variables
@@ -28,6 +28,8 @@ var bot = new Discord.Client();
 
 //bot methods
 bot.JSONtoCollection = JSONtoCollection;
+bot.updateJSON = updateJSON;
+bot.loadCmds = loadCmds;
 
 
 
@@ -41,10 +43,7 @@ bot.globalVar = require(varFile);
 bot.userVars = require(usersFile);
 bot.prefix = config.prefix;
 bot.auth = config.token;
-bot.config = config;
 bot.sayings = require(sayingsFile);
-bot.updateJSON = updateJSON;
-bot.loadCmds = loadCmds;
 bot.ccFile = ccFile;
 
 //set up logging
@@ -53,12 +52,12 @@ bot.logger = Winston.createLogger({
     format: Winston.format.combine(
         Winston.format.timestamp(),
         Winston.format.prettyPrint(),
-        Winston.format.label({lebel:'logging'}),
+        Winston.format.label({label:'logging'}),
         myFormat
     ),
     transports: [
         new Winston.transports.Console(),
-        new Winston.transports.File({filename:'info.log'}),
+        new Winston.transports.File({filename:'info.log'})
     ]
 });
 
@@ -66,7 +65,7 @@ var netLog = Winston.createLogger({
     format: Winston.format.combine(
         Winston.format.timestamp(),
         Winston.format.prettyPrint(),
-        Winston.format.label({lebel:'logging'}),
+        Winston.format.label({label:'network'}),
         myFormat
     ),
     transports:[
@@ -245,11 +244,94 @@ bot.on('resume', replayed => {
 	bot.user.setActivity(bot.globalVar.activity);
 });
 
+//starboard events
+bot.on('messageReactionAdd', (reaction, user) =>{
+    bot.logger.info(`Reaction detected on ${reaction.message.guild.name}`);
 
+    var server = reaction.message.guild;
+    if(!bot.myGuilds[server.id].starboard_chan){
+        bot.logger.warn(`Starboard is not set up for ${server.name}`);
+        return;
+    }
+
+    var guildData = bot.myGuilds[server.id];
+    if(guildData.ignore.includes(reaction.message.channel)){
+        //woops lol
+    }
+
+    if(reaction.count >= guildData.star_lvl && reaction.emoji == guildData.star_emoji){
+        //do starboard stuff
+        var channel = server.channels.find(chan => chan.id === guildData.starboard_chan);
+        bot.logger.debug(`Channel ${channel}`);
+        var author = reaction.message.member;
+        bot.logger.debug(`Author ${author}`);
+        var text = reaction.message.content;
+        bot.logger.debug(`text ${text}`);
+        var embeds = reaction.message.embeds;
+        bot.logger.debug(`embeds ${embeds}`);
+        var time = reaction.message.createdTimestamp;
+        bot.logger.debug(`time ${time}`);
+
+        var result = new Discord.RichEmbed();
+
+        result.setTimestamp(time);
+        result.setColor(author.displayColor);
+        result.setAuthor(author.displayName, author.user.avatarURL);
+        result.setFooter(server.name);
+        result.setDescription(text);
+
+        var e = reaction.message.embeds[0];
+        if(e){
+
+            bot.logger.debug(`Found an embed ${e}`);
+            if(e.title) result.setTitle(e.title);
+
+            if(e.thumbnail) result.setThumbnail(e.thumbnail.url);
+
+            if(e.description) result.setDescription(text +  '\n\n' + e.description);
+
+            if(e.footer) result.setFooter(e.footer.text);
+
+            if(e.author) result.setAuthor(e.author.name, e.author.icon);
+
+            if(e.color) result.setColor(e.color);
+
+            if(e.image) result.setImage(e.image.url);
+
+            if(e.file) result.attachFile(e.file);
+
+            if(e.files) result.attachFiles(e.files);
+
+            if(e.url) result.setURL(e.url);
+
+        }
+
+        var att = reaction.message.attachments.first();
+        if(att){
+
+            bot.logger.debug(`Found an attachment ${att}`);
+            result.setImage(att.url);
+        }
+
+        channel.send(`${reaction.emoji} #${reaction.count}`, result);
+    }
+});
+
+
+//logging stuff
 bot.on('debug', info => {
 	netLog.info(info); //only logs to the network.log file
     bot.logger.verbose(info);
 });
+
+bot.on('warn', info => {
+    bot.logger.warn(info);
+});
+
+bot.on('error', info => {
+    bot.logger.error(info);
+});
+
 //functions
 
 function updateJSON(fileName, data, cooked){

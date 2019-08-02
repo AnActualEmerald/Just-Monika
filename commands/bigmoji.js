@@ -19,18 +19,18 @@ module.exports = {
 	args:true,
 	usage:'<emoji>',
 	cooldown:1500,
-	execute(message, args, bot){		
-		var emoji = args.shift();		
+	execute(message, args, bot){
+		var emoji = args.shift();
 		var img;
-		
+
 		if(!emoji.startsWith('<'))
-			return message.channel.send('I can\'t get that emoji, pilot');
-		
+			return message.channel.send('I can\'t get that emoji');
+
 		if(emoji.startsWith('<a'))
 			img = animatedEmoji(emoji);
 		else
 			img = normalEmoji(emoji);
-		
+
 		message.channel.send({files:[img]});
 	},
 };
