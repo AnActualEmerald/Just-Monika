@@ -10,18 +10,20 @@ const usersFile  = './users.json';
 const varFile = './commands/cmdVars.json';
 const sayingsFile = './commands.json';
 const ccFile = './commands/customCommands.json';
+const starFile = './starboard.json';
 
 
 var config = require(configFile);
 var ccF = require(ccFile);
+
 
 //logging format
 const myFormat = Winston.format.printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
-//command variables
-var goodBooks = ["Stormlight Archive by Brandon Sanderson", "Mistborn trilogy by Brandon Sanderson", "Wheel of Time by Robert Jordan"];
+//other variables
+var starredMsgs = require(starFile);
 
 //create bot
 var bot = new Discord.Client();
@@ -246,7 +248,10 @@ bot.on('resume', replayed => {
 
 //starboard events
 bot.on('messageReactionAdd', (reaction, user) =>{
-    bot.logger.info(`Reaction detected on ${reaction.message.guild.name}`);
+
+
+
+    bot.logger.debug(`Reaction detected on ${reaction.message.guild.name}`);
 
     var server = reaction.message.guild;
     if(!bot.myGuilds[server.id].starboard_chan){
@@ -306,15 +311,27 @@ bot.on('messageReactionAdd', (reaction, user) =>{
 
         }
 
+
         var att = reaction.message.attachments.first();
         if(att){
-
             bot.logger.debug(`Found an attachment ${att}`);
             result.setImage(att.url);
         }
 
-        channel.send(`${reaction.emoji} #${reaction.count}`, result);
+        if(starredMsgs[reaction.message.id]){
+            bot.logger.info(`Message was starred already: ${reaction.message.url}`);
+            var id = starredMsgs[reaction.message.id].star_id;
+            channel.messages.find(msg => msg.id === id).edit(`${reaction.emoji} #${reaction.count}`, result);
+            return;
+        }else{
+            channel.send(`${reaction.emoji} #${reaction.count}`, result)
+                .then(msg => {
+                    starredMsgs[reaction.message.id] = {star_id:msg.id};
+                });
+        }
     }
+
+    updateJSON(starFile, starredMsgs);
 });
 
 
