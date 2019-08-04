@@ -129,7 +129,7 @@ bot.on('guildMemberAdd', member => {
 });
 
 bot.on('guildCreate', guild => {
-	bot.myGuilds[guild.id] = {'name':guild.name,'welcomeChannel':'general','welcomeMessage':'Welcome to the server, <@${user.id}>'};
+	bot.myGuilds[guild.id] = {'name':guild.name,'welcomeChannel':'general','welcomeMessage':'Welcome to the server, <@${user.id}>','ignore':[]};
 	updateJSON(guildFile, bot.myGuilds);
 	guild.owner.send(`Hey there, I just joined your server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use ${bot.prefix}help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. You can change this and the message I send using ${bot.prefix}welcomechannel and ${bot.prefix}welcomemsg. I look forward to memeing with you!`);
 
