@@ -45,6 +45,8 @@ bot.globalVar = require(varFile);
 bot.userVars = require(usersFile);
 bot.prefix = config.prefix;
 bot.auth = config.token;
+bot.gr_key = config.goodreads_key;
+bot.gr_secret = config.goodreads_secret;
 bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
 
