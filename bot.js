@@ -59,7 +59,8 @@ bot.logger = Winston.createLogger({
     ),
     transports: [
         new Winston.transports.Console(),
-        new Winston.transports.File({filename:'info.log'})
+        new Winston.transports.File({filename:'info.log'}),
+        new Winston.transports.File({filename:'debug_garbage.log',level:'silly'})
     ]
 });
 
@@ -208,7 +209,7 @@ bot.on('message', message => {
 			try{
 				com.execute(message, args, bot);
 			}catch(e){
-				console.log(e);
+				bot.logger.error(e);
 				message.channel.send("Had trouble with that command, check the logs");
 			}
 
