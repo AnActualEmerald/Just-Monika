@@ -287,6 +287,7 @@ bot.on('messageReactionAdd', (reaction, user) =>{
         result.setAuthor(author.displayName, author.user.avatarURL);
         result.setFooter(server.name);
         result.setDescription(text);
+        result.setURL(reaction.message.url);
 
         var e = reaction.message.embeds[0];
         if(e){
