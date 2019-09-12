@@ -162,19 +162,6 @@ bot.on('message', message => {
 		const cmdName = args.shift().toLowerCase();
 
 		bot.logger.debug(args);
-/*
-
-
-		if(cmdName == "reload"){
-			if(!message.member.hasPermission('ADMINISTRATOR')){
-				message.reply('you don\'t have permission to use this command');
-				return;
-			}else{
-				loadCmds();
-				return message.channel.send({embed:{description:"Reloaded all commands"}});
-
-			}
-		} */
 
 			const com = bot.commands.get(cmdName)
 				|| bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
@@ -224,11 +211,21 @@ bot.on('message', message => {
 			if(!bot.sayings[s].sens){
 				cont= cont.toLowerCase();
 			}
-			if(cont.startsWith(s))
-			{
-				message.channel.send(bot.sayings[s].text);
-			}
-		}
+            if(!cont.startsWith(s)) continue;
+            var trigger = cont.substring(0, s.length);
+            bot.logger.silly(`trigger = ${trigger}`);
+            var rest = cont.substring(s.length);
+            bot.logger.silly(`rest = ${rest}`)
+            if(trigger == s){
+                bot.logger.debug();
+                if(rest){
+                    if(rest.startsWith(' '))
+                        message.channel.send(bot.sayings[s].text);
+                }else{
+                    message.channel.send(bot.sayings[s].text);
+                }
+		    }
+        }
 
 
 	updateJSON(varFile, bot.globalVar);
@@ -248,6 +245,32 @@ bot.on('resume', replayed => {
     bot.logger.warn('Resuming bot');
 	bot.user.setActivity(bot.globalVar.activity);
 });
+
+//event emitter mostly from https://discordjs.guide/popular-topics/reactions.html#emitting-the-event-s-yourself
+const events = {MESSAGE_REACTION_ADD: 'messageReactionAdd'};
+bot.on('raw', e =>{
+    bot.logger.silly(`Event detected: ${e}`);
+    if (!events.hasOwnProperty(e.t)) return; //check to see if the even is MESSAGE_REACTION_ADD
+    const data = e.d;
+    bot.logger.silly(`Data = ${data}`);
+    const user = bot.users.get(data.user_id);
+    bot.logger.silly(`User = ${user}`);
+    const channel = bot.channels.get(data.channel_id);
+    bot.logger.silly(`Channel = ${channel}`);
+
+    if (channel.messages.has(data.message_id)) return; //prevent double emission
+
+    channel.fetchMessage(data.message_id).then(message =>{
+        const emojiKey = (data.emoji.id) ? `${data.emoji.name}:${data.emoji.id}` : data.emoji.name;
+
+        const reaction = message.reactions.get(emojiKey);
+
+        bot.emit(events[e.t], reaction, user);
+    });
+
+
+});
+
 
 //starboard events
 bot.on('messageReactionAdd', (reaction, user) =>{
@@ -334,6 +357,8 @@ bot.on('messageReactionAdd', (reaction, user) =>{
                 });
         }
     }
+
+//    bot.commands.get('reactrole').handle(reaction, user);
 
     updateJSON(starFile, starredMsgs);
 });

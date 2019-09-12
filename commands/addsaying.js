@@ -17,7 +17,7 @@ module.exports = {
 			t = t.replace('-c ', '');
 			bot.sayings[saying] = {sens: true, text: t};
 		}else{
-			bot.sayings[saying.toLowerCase] = {text: t};
+			bot.sayings[saying.toLowerCase()] = {text: t};
 		}
 
 		message.reply(`Saying \`${saying}\` added`);
