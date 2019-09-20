@@ -7,15 +7,15 @@
   "dependencies": {
     "@discordjs/uws": "^11.149.1",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
-    "discord.js": "^11.4.2",
+    "discord.js": "^11.5.1",
     "goodreads-api-node": "0.0.10",
-    "jimp": "^0.6.1",
+    "jimp": "^0.6.8",
     "lodash": "^4.17.15",
     "log-timestamp": "^0.3.0",
     "npm": "^6.10.2",
     "winston": "^3.2.1",
     "ws": "^7.1.1",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.22"
   },
   "devDependencies": {},
   "scripts": {

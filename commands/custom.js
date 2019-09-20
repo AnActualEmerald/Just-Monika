@@ -4,7 +4,7 @@ module.exports = {
 	name:`custom`,
 	description:`handle custom commands, only use the third argument when adding a command`,
 	args:true,
-	admin:true,
+	admin:false,
 	alias:[`cc`],
 	usage:`<add|remove|edit|list> <command name> | <command text>`,
 	execute(message, args, bot){
