@@ -1,19 +1,19 @@
 module.exports = {
 	name: "nom",
-	description: "How many burritos have been eaten",
+	description: "Eats whatever you want, or a burrito by default",
 	args: false,
 	usage:'| <thing>',
 	execute(msg, args, bot){
-		if(args.length != 0){
+		if(args.length != 0){ //check if there are args
 			var thing = args.toString().replace(/,/g, ' ');
 			var numberE = bot.globalVar[`${thing}sEaten`];
 			var plur = '';
-			if(!numberE) {bot.globalVar[`${thing}sEaten`] = numberE = 1}
+			if(!numberE) {bot.globalVar[`${thing}sEaten`] = numberE = 1} //add the thing to the JSON if it's not there already
 			else{
-				bot.globalVar[`${thing}sEaten`] = numberE += 1;
+				bot.globalVar[`${thing}sEaten`] = numberE += 1; //increment
 			}
 
-			if(numberE>1){plur='s';}
+			if(numberE>1){plur='s';} //Is it plural or not
 			msg.channel.send(`OM NOM NOM tasty '${thing}'. I've eaten ${numberE} '${thing}'${plur}`).catch(bot.logger.error);
 			return;
 		}

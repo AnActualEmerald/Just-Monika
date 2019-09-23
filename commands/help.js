@@ -1,26 +1,29 @@
+const {RichEmbed} = require('discord.js');
+
 module.exports = {
 	name: "help",
-	description: "show all commands and their variables (command-specific help coming soon^TM)",
+	description: "show all commands and their variables",
 	args: false,
 	alias: '',
 	execute(message, args, bot){
 		var data = [];
 		if(!args.length)
 		{
+			var count = 0;
+			var embed = new RichEmbed().setTitle("Here's a list of my commands: ").setColor(message.member.displayColor);
 
-			data.push('Here\'s a list of all my commands:');
-			data.push(bot.commands.map(command => command.name).join(',\n'));
-			data.push(`\nYou can send \`${bot.prefix}help [command name]\` to get info on a specific command!`);
+			bot.commands.forEach((value, key) => {
+				if(count >= 25) {data.push(embed); embed = new RichEmbed().setColor(message.member.displayColor); count = 0;}
+				embed.addField(key, value.description);
+				count++;
+			});
+			data.push(embed);
+			data[data.length - 1].setFooter(`You can send \`${bot.prefix}help [command name]\` to get info on a specific command!`);
 
-			return message.author.send(data, {split: true})
-				.then(() => {
-					if (message.channel.type === 'dm') return;
-					message.reply('I\'ve sent you a DM with all my commands!');
-				})
-			.catch(error => {
+			return data.forEach(val => message.author.send(val)	.catch(error => {
 				bot.logger.error(`Could not send help DM to ${message.author.tag}.\n`, error);
 				message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
-			});
+			}));
 		}
 
 		const com = bot.commands.get(args[0]);
