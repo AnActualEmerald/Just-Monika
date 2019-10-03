@@ -1,13 +1,4 @@
 node_modules
 ./node_modules
-config.json
-users.json
-guilds.json
-guilds.json
-users.json
 *.log
-starboard.json
-info.log
-network.log
-users.json
-guilds.json
+*.json
