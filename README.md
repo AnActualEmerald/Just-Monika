@@ -16,7 +16,7 @@ The most important file you'll need is a config.json in the root directory that 
 
 ```json
 {
-"token":"yourDiscordappToken"
+"token":"yourDiscordappToken",
 "prefix":"whateverYouWant",
 "debug":true,
 "winston_lvl":"debug"
