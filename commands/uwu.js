@@ -9,7 +9,7 @@ module.exports = {
     category:'fun',
     execute(message, args, bot){
         var t = args.toString().replace(/,/g, ' ');
-        var res = t.replace('l', 'w').replace('r', 'w');
+        var res = t.replace(/l/g, 'w').replace(/r/, 'w');
         message.channel.send(res);
     },
 };
