@@ -236,8 +236,8 @@ bot.on('message', message => {
 bot.on('disconnect', event =>{
 	bot.logger.error("Websocket disconnected, code: " + event.code);
 	bot.logger.error(event.reason);
-	bot.destroy();
-	bot.login(config.token);
+	//bot.destroy();
+	//bot.login(config.token);
 });
 
 bot.on('resume', replayed => {
