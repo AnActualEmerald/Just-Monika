@@ -1,3 +1,5 @@
+const uwuOptions = ['UwU', 'Uwu', 'uwU', 'ÚwÚ', 'uwu', '☆w☆', '✧w✧', '♥w♥', '︠uw ︠u', '(uwu)', 'OwO', 'owo', 'Owo', 'owO'];
+
 module.exports = {
     name:'uwu',
     alias:[],
@@ -9,7 +11,8 @@ module.exports = {
     category:'fun',
     execute(message, args, bot){
         var t = args.toString().replace(/,/g, ' ');
-        var res = t.replace(/l/g, 'w').replace(/r/g, 'w');
+        var res = t.replace(/l/g, 'w').replace(/r/g, 'w').replace(/th/g, 'd');
+        res = res + " " + uwuOptions[Math.floor(Math.random() * (uwuOptions.length - 1))]
         message.channel.send(res);
     },
 };
