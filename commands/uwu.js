@@ -1,7 +1,7 @@
 module.exports = {
     name:'uwu',
     alias:[],
-    descritpion:'Translates text into uwu UwU',
+    description:'Translates text into uwu UwU',
     admin:false,
     args:true,
     usage:'<text>',
