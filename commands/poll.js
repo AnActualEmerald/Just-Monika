@@ -11,7 +11,7 @@ module.exports = {
     cooldown:5000,
     admin:false,
     execute(message, args, bot){
-        var options = args.toString().replace(/,/g, ' ').split(';');
+        var options = args.join(" ").split(';');
         var question = new RichEmbed().setTitle(`${message.member.displayName} asks: ${options.shift().replace(/,/g, ' ')}`).setColor(message.member.displayColor);
 
 
@@ -41,9 +41,9 @@ module.exports = {
             }
         }).catch(bot.logger.error);
         message.delete();
-        
 
-        
+
+
     },
 
 

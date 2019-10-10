@@ -5,7 +5,7 @@ module.exports = {
 	usage:'<activity>',
 	admin:true,
 	execute(message, args, bot){
-		bot.globalVar.activity = args.toString().replace(/,/g, " ")
+		bot.globalVar.activity = args.join(" ");
 		bot.user.setActivity(bot.globalVar.activity);
 		message.channel.send({embed:{description:'Activity set'}}).catch(console.err);
 	},

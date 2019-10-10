@@ -5,7 +5,7 @@ module.exports = {
 	admin: true,
 	usage: '"<saying>" <option> <text>',
 	execute(message, args, bot){
-		var con = args.toString().replace(/,/g, ' ').split(/"/g);
+		var con = args.join(" ").split(/"/g);
 		var saying = con[1];
 		var t = con[2].trim();
 

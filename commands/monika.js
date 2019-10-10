@@ -38,7 +38,7 @@ module.exports = {
 		message.channel.startTyping();
 		//x450 y475
 		var loadedImg;
-		var caption = args.toString().replace(/,/g, ' ');
+		var caption = args.join(" ");
 		var editedFile = './commands/res/ScorchTmp.jpg'
 		var font;
 		bot.logger.debug(`Caption: ${caption}`);

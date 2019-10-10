@@ -16,7 +16,7 @@ module.exports = {
         const credentials = {key:bot.gr_key,secret:bot.gr_secret};
         //const gr_client = goodreads(credentials);
 
-        var q_string = args.toString().replace(/,/g, ' ');
+        var q_string = args.join(" ");
 
         if(!bot.globalVar.rate_ok){
             bot.logger.warn('goodreads rate limit');

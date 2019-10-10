@@ -16,7 +16,7 @@ module.exports = {
 
 		if(mode == operations[0]){
 			const command = args.shift();
-			const text = args.toString().replace(/,/g, ' ');
+			const text = args.join(" ");
 
 		//	if(!command.startsWith(bot.prefix)) return message.reply(`Commands need to start with ${bot.prefix}`);
 
@@ -39,7 +39,7 @@ module.exports = {
 		if(mode == operations[2]){
 			const command = args.shift().replace(bot.prefix, '');
 
-			bot.customComs.set(command, args.toString().replace(/,/g, ' '));
+			bot.customComs.set(command, args.join(" "));
 
 			message.channel.send(`Updated ${command}`)
 

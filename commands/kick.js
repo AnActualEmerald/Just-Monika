@@ -8,7 +8,7 @@ module.exports = {
 	execute(message, args, bot){
 		var userID = args.shift().replace('<@', '').replace('!', '').replace('>', '');
 		var user = message.member.guild.members.get(userID);
-		var reason = args.toString().replace(/,/g, ' ');
+		var reason = args.join(" ");
 
 		user.kick(reason)
 			.then(() => message.channel.send(`Kicked <@${userID}> for \`${reason}\``))

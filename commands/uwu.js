@@ -10,8 +10,10 @@ module.exports = {
     cooldown:500,
     category:'fun',
     execute(message, args, bot){
-        var t = args.toString().replace(/,/g, ' ');
-        var res = t.replace(/l/g, 'w').replace(/r/g, 'w').replace(/th/g, 'd');
+        var t = args.join(" ");
+        var res = t.replace(/l|r/g, 'w').replace(/L|R/g, 'W'); //Get basic uwuing out of the way
+        res = res.replace(/the /g, 'da ').replace(/The /g, 'Da ').replace(/THE /g, 'DA ');
+        res = res.replace(/th/g, 'd').replace(/Th|TH/g, 'D'); //Then add more advanced uwuing
         res = res + " " + uwuOptions[Math.floor(Math.random() * (uwuOptions.length - 1))]
         message.channel.send(res);
     },

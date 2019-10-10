@@ -5,7 +5,7 @@ module.exports = {
 	usage:'| <thing>',
 	execute(msg, args, bot){
 		if(args.length != 0){ //check if there are args
-			var thing = args.toString().replace(/,/g, ' ');
+			var thing = args.join(" ");
 			var numberE = bot.globalVar[`${thing}sEaten`];
 			var plur = '';
 			if(!numberE) {bot.globalVar[`${thing}sEaten`] = numberE = 1} //add the thing to the JSON if it's not there already

@@ -11,15 +11,14 @@ module.exports = {
     cooldown:1500,
     usage:'<title>',
     execute(message, args, bot){
-        var q_string = args.toString().replace(/,/g, ' ');
-
+        var q_string = args.join(" ");
+        message.channel.startTyping();
         search(message, q_string, bot);
     },
 }
 
 async function search(message, q_string, bot){
 
-    message.channel.startTyping();
     while(!bot.globalVar.rate_ok && tries < 10){
         bot.logger.warn('goodreads rate limit');
         await sleep(100);
