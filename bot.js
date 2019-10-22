@@ -165,69 +165,74 @@ bot.on('message', message => {
 
 		bot.logger.debug(args);
 
-			const com = bot.commands.get(cmdName)
-				|| bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
+		const com = bot.commands.get(cmdName)
+			|| bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
 
 
-			if(bot.customComs.has(cmdName))
-				return message.channel.send(bot.customComs.get(cmdName));
-
-			if(!com){
-				return message.channel.send("No such command, sorry");
-			}
-
-			if(com.args && !args.length)
-			{
-				return message.channel.send(`The proper usage is \'${bot.prefix}${com.name} ${com.usage}\'`);
-			}
-
-			if(com.admin && !message.member.hasPermission('ADMINISTRATOR'))
-			{
-				return message.channel.send(`This command is admin only, ${message.author}`);
-			}
-
-			if(com.cooldown)
-			{
-				if(bot.coolDowns.get(message.member.id) == com.name)
-				{
+		if(bot.customComs.has(cmdName))
+			return message.channel.send(bot.customComs.get(cmdName));
+		if(!com){
+			return bot.logger.debug(`No command ${cmdName} found`);
+		}
+		if(com.cooldown)
+		{
+			if(bot.coolDowns.get(message.member.id) == com.name){
 					message.reply("You're doing that too much");
 					return;
 				}else{
 					bot.coolDowns.set(message.member.id, com.name);
 					setTimeout(function(){bot.coolDowns.delete(message.member.id);}, com.cooldown);
 				}
+		}
+		
+		//check perms
+		var perms = com.perms.map(val => {
+			if(val === "OWNER"){
+				if(message.author.id != 198606745034031104){ //change this if you cloned this bot
+					message.reply("You don't have permission to use this command");
+					return false;
+				} else {
+					return message.member.hasPermission(val, flase, true, true);
+				}
 			}
-			try{
-				com.execute(message, args, bot);
-			}catch(e){
-				bot.logger.error(e);
-				message.channel.send("Had trouble with that command, check the logs");
-			}
+		});
 
+
+		try{
+			if(perms.has(false)){
+				message.reply("You don't have permission to use that command");
+			} else
+				com.execute(message, args, bot);
+		}catch(e){
+			bot.logger.error(e);
+			if(config.debug)
+				message.channel.send("Had trouble with that command");
 		}
 
+	}
 
-		for(var s in bot.sayings)
-		{
-			var cont = message.content
-			if(!bot.sayings[s].sens){
-				cont= cont.toLowerCase();
-			}
-            if(!cont.startsWith(s)) continue;
-            var trigger = cont.substring(0, s.length);
-            bot.logger.silly(`trigger = ${trigger}`);
-            var rest = cont.substring(s.length);
-            bot.logger.silly(`rest = ${rest}`)
-            if(trigger == s){
-                bot.logger.debug();
-                if(rest){
-                    if(rest.startsWith(' '))
-                        message.channel.send(bot.sayings[s].text);
-                }else{
+
+	for(var s in bot.sayings)
+	{
+		var cont = message.content
+		if(!bot.sayings[s].sens){
+			cont= cont.toLowerCase();
+		}
+        if(!cont.startsWith(s)) continue;
+        var trigger = cont.substring(0, s.length);
+        bot.logger.silly(`trigger = ${trigger}`);
+        var rest = cont.substring(s.length);
+        bot.logger.silly(`rest = ${rest}`)
+        if(trigger == s){
+            bot.logger.debug();
+            if(rest){
+                if(rest.startsWith(' '))
                     message.channel.send(bot.sayings[s].text);
-                }
-		    }
-        }
+            }else{
+                message.channel.send(bot.sayings[s].text);
+            }
+	    }
+    }
 
 
 	updateJSON(varFile, bot.globalVar);
