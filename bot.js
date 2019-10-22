@@ -135,6 +135,8 @@ bot.on('guildCreate', guild => {
 
 });
 
+//// TODO: rewrite this handler for readability and efficiency
+//// may require rethinking how permissions and cooldowns are handled
 bot.on('message', message => {
 
 
