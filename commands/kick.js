@@ -1,7 +1,7 @@
 module.exports = {
 	name:'kick',
 	description:'kicks a user',
-	admin:true,
+	perms:['KICK_MEMBERS'],
 	args:true,
 	usage:'<user> <reason>',
 	cooldown:1500,

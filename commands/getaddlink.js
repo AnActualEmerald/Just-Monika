@@ -1,6 +1,5 @@
 module.exports = {
 	name:`getaddlink`,
-	admin:false,
 	args:false,
 	alias:['addlink'],
 	description:`Returns the link used to add the bot to a server`,

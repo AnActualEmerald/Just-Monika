@@ -2,10 +2,10 @@ module.exports = {
 	name:'reload',
 	description:'reloads the bot\'s commands',
 	alias:[],
-	admin:true,
+	perms:['OWNER'],
 	args:false,
 	usage:'',
-	cooldown:'3000',
+	cooldown:3000,
 	execute(message, args, bot){
 		try{
 			bot.loadCmds(message);

@@ -2,7 +2,7 @@ module.exports = {
 	name: "stop",
 	description: "Stops the current instance of the bot",
 	args: false,
-	admin: true,
+	perms:['OWNER'],
 	execute(message, args, bot){
 		if(!message.member.hasPermission('ADMINISTRATOR')){
 			message.reply('you don\'t have permission to use this command');

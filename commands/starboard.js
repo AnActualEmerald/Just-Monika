@@ -4,7 +4,7 @@ module.exports = {
     name: 'starboard',
     alias: ['setstar', 'setstaremoji'],
     description: 'Starboard manager. See documentation for detailed info',
-    admin: true,
+    perms:['MANAGE_GUILD'],
     args: true,
     usage: '<emoji|channel|ignore|threshold> <param>',
     execute(message, args, bot){

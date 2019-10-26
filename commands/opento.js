@@ -3,7 +3,7 @@ module.exports = {
     alias:['open', 'openfor'],
     description:'Allows a roll or member to type in the channel called in',
     args:true,
-    admin:true,
+    perms:['MANAGE_CHANNELS'],
     usage:'<user|role>',
     cooldown:1000,
     execute(message, args, bot){

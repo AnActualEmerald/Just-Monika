@@ -3,7 +3,7 @@ module.exports = {
 	description:'set the current activity for the bot',
 	args:true,
 	usage:'<activity>',
-	admin:true,
+	perms:['OWNER'],
 	execute(message, args, bot){
 		bot.globalVar.activity = args.join(" ");
 		bot.user.setActivity(bot.globalVar.activity);
