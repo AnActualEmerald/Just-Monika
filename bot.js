@@ -1,6 +1,5 @@
 var Discord = require("discord.js");
 var fs = require("fs");
-//var stamp = require('log-timestamp');
 var Winston = require("winston");
 
 //file locations
@@ -129,8 +128,6 @@ bot.on("guildCreate", guild => {
     );
 });
 
-//// TODO: rewrite this handler for readability and efficiency
-//// may require rethinking how permissions and cooldowns are handled
 bot.on("message", message => {
     if (message.channel.type === "dm") {
         return handleDM(message);
