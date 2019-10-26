@@ -5,7 +5,7 @@ module.exports = {
     description: 'Sets where the channel that the bot sends welcome messages to',
     usage: '',
     cooldown: 1500,
-    admin:true,
+    perms:['MANAGE_GUILD'],
     execute(message, args, bot){
         var guildName = message.member.guild.id;
         bot.myGuilds[guildName].welcomeChannel = message.channel.name;

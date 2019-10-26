@@ -1,6 +1,6 @@
 module.exports = {
 		name:'setwelcomemsg',
-		admin:true,
+		perms:['MANAGE_GUILD'],
 		args:true,
 		alias:['setwmsg', 'welcomemsg'],
 		description:'Changes the server\'s welcome message. Use <@${user.id}> to mention the new uers. Or, use &{user.username} to just display their name and not mention them.',

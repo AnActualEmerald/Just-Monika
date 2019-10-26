@@ -4,7 +4,7 @@ module.exports = {
     name:'gitpull',
     alias:['gp', 'pull'],
     description:'Refreshes the git repository the bot is running from on the remote server',
-    admin:true,
+    perms:["OWNER"],
     args:false,
     category:'management',
     execute(message, args, bot){

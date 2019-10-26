@@ -9,7 +9,6 @@ module.exports = {
     args:true,
     usage:'<question>; <option 1>; <option 2>; ... <option 10>;',
     cooldown:5000,
-    admin:false,
     execute(message, args, bot){
         var options = args.join(" ").split(';');
         var question = new RichEmbed().setTitle(`${message.member.displayName} asks: ${options.shift().replace(/,/g, ' ')}`).setColor(message.member.displayColor);

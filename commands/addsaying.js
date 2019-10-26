@@ -2,7 +2,7 @@ module.exports = {
 	name: 'addsaying',
 	description: 'Adds a saying for the bot. Add -c to make it case sensitive',
 	args: true,
-	admin: true,
+	perms:["MANAGE_MESSAGES"],
 	usage: '"<saying>" <option> <text>',
 	execute(message, args, bot){
 		var con = args.join(" ").split(/"/g);

@@ -3,7 +3,7 @@ module.exports = {
     alias:['close', 'closefor'],
     description:'Restricts a roll or member from typing in the channel called in',
     args:true,
-    admin:true,
+    perms:['MANAGE_CHANNELS'],
     usage:'<user|role>',
     cooldown:1000,
     execute(message, args, bot){
