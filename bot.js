@@ -128,6 +128,15 @@ bot.on("guildCreate", guild => {
     );
 });
 
+bot.on("guildUpdate", guild => {
+    try {
+        bot.myGuilds[guild.id].name = guild.name;
+    } catch (err) {
+        bot.logger.error(err);
+    }
+    updateJSON(guildFile, bot.myGuilds);
+});
+
 bot.on("message", message => {
     if (message.channel.type === "dm") {
         return handleDM(message);
