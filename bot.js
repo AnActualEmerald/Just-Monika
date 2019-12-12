@@ -214,6 +214,7 @@ bot.on("message", message => {
         }
     }
 
+    /* 
     for (var s in bot.sayings) {
         var cont = message.content;
         if (!bot.sayings[s].sens) {
@@ -233,7 +234,7 @@ bot.on("message", message => {
                 message.channel.send(bot.sayings[s].text);
             }
         }
-    }
+    } */
 
     updateJSON(varFile, bot.globalVar);
     updateJSON(sayingsFile, bot.sayings);
