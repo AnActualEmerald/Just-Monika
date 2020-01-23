@@ -23,6 +23,7 @@ const myFormat = Winston.format.printf(
 
 //other variables
 var starredMsgs = require(starFile);
+var today = new Date();
 
 //create bot
 var bot = new Discord.Client();
@@ -58,10 +59,10 @@ bot.logger = Winston.createLogger({
     transports: [
         new Winston.transports.Console(),
         new Winston.transports.File({
-            filename: `info${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`
+            filename: `info${today.getMonth()}-${today.getDate()}.log`
         }),
         new Winston.transports.File({
-            filename: `debug_garbage${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`,
+            filename: `debug_garbage${today.getMonth()}-${today.getDate()}.log`,
             level: "silly"
         })
     ]
@@ -76,7 +77,7 @@ var netLog = Winston.createLogger({
     ),
     transports: [
         new Winston.transports.File({
-            filename: `network${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`
+            filename: `network${today.getMonth()}-${today.getDate()}.log`
         })
     ]
 });
