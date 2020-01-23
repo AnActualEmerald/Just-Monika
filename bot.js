@@ -57,9 +57,11 @@ bot.logger = Winston.createLogger({
     ),
     transports: [
         new Winston.transports.Console(),
-        new Winston.transports.File({ filename: "info.log" }),
         new Winston.transports.File({
-            filename: "debug_garbage.log",
+            filename: `info${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`
+        }),
+        new Winston.transports.File({
+            filename: `debug_garbage${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`,
             level: "silly"
         })
     ]
@@ -72,7 +74,11 @@ var netLog = Winston.createLogger({
         Winston.format.label({ label: "network" }),
         myFormat
     ),
-    transports: [new Winston.transports.File({ filename: "network.log" })]
+    transports: [
+        new Winston.transports.File({
+            filename: `network${Date.prototype.getUTCMonth()}-${Date.prototype.getUTCDate()}.log`
+        })
+    ]
 });
 
 //a little snippet taken from stack exchange (thanks Mateusz Moska)
