@@ -40,7 +40,6 @@ bot.coolDowns = new Discord.Collection();
 bot.customComs = JSONtoCollection(require(ccFile));
 bot.globalVar = require(varFile);
 bot.userVars = require(usersFile);
-bot.prefix = config.prefix;
 bot.auth = config.token;
 bot.gr_key = config.goodreads_key;
 bot.gr_secret = config.goodreads_secret;
@@ -125,6 +124,7 @@ bot.on("guildMemberAdd", member => {
 bot.on("guildCreate", guild => {
     bot.myGuilds[guild.id] = {
         name: guild.name,
+        prefix: "!",
         welcomeChannel: "general",
         welcomeMessage: "Welcome to the server, <@${user.id}>",
         ignore: []
@@ -149,21 +149,16 @@ bot.on("message", message => {
         return handleDM(message);
     }
 
-    if (!bot.userVars[message.author]) {
-        bot.userVars[message.author] = 0;
-    }
-
-    bot.userVars[message.author] = parseInt(bot.userVars[message.author]) + 1;
-
-    updateJSON(usersFile, bot.userVars);
+    let guild = message.member.guild.id;
 
     if (message.author.bot) return;
 
+    let prefix = bot.myGuilds[guild].prefix;
     //listen for commands starting with the prefix
-    if (message.content.startsWith(bot.prefix)) {
+    if (message.content.startsWith(prefix)) {
         bot.logger.info("Command string: " + message.content);
 
-        const args = message.content.slice(bot.prefix.length).split(/ +/);
+        const args = message.content.slice(prefix.length).split(/ +/);
         const cmdName = args.shift().toLowerCase();
 
         bot.logger.debug(args);
@@ -242,6 +237,14 @@ bot.on("message", message => {
             }
         }
     } */
+
+    if (!bot.userVars[message.author]) {
+        bot.userVars[message.author] = 0;
+    }
+
+    bot.userVars[message.author] = parseInt(bot.userVars[message.author]) + 1;
+
+    updateJSON(usersFile, bot.userVars);
 
     updateJSON(varFile, bot.globalVar);
     updateJSON(sayingsFile, bot.sayings);
