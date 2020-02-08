@@ -8,7 +8,7 @@ module.exports = {
     perms: ["MANAGE_GUILD"],
     execute(message, args, bot) {
         var guildName = message.member.guild.id;
-        bot.myGuilds[guildName].prefix = args[0];
-        message.channel.send(`Set server prefix to ${args[0]}`);
+        bot.myGuilds[guildName].prefix = args[0] != null? args[0] : '!';
+        message.channel.send(`Set server prefix to ${bot.myGuilds[guildName].prefix}`);
     }
 };
