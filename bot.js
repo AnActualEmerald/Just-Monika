@@ -1,6 +1,7 @@
 var Discord = require("discord.js");
 var fs = require("fs");
 var Winston = require("winston");
+var util = require(`util`);
 
 //file locations
 const guildFile = "./guilds.json";
@@ -265,124 +266,58 @@ bot.on("resume", replayed => {
 });
 
 //event emitter mostly from https://discordjs.guide/popular-topics/reactions.html#emitting-the-event-s-yourself
-const events = { MESSAGE_REACTION_ADD: "messageReactionAdd" };
-bot.on("raw", e => {
-    bot.logger.silly(`Event detected: ${e}`);
-    if (!events.hasOwnProperty(e.t)) return; //check to see if the even is MESSAGE_REACTION_ADD
+const events = {
+    MESSAGE_REACTION_ADD: "messageReactionAdd",
+    MESSAGE_DELETE: "messageDelete"
+};
+bot.on("raw", (e, m) => {
+    bot.logger.silly(`Event detected: ${util.inspect(e)}`);
+    bot.logger.silly(`Anything?: ${util.inspect(m)}`);
+    if (!events.hasOwnProperty(e.t)) return; //check to see if the event is MESSAGE_REACTION_ADD
     const data = e.d;
-    bot.logger.silly(`Data = ${data}`);
+    bot.logger.silly(`Data = ${util.inspect(data)}`);
     const user = bot.users.get(data.user_id);
-    bot.logger.silly(`User = ${user}`);
+    bot.logger.silly(`User = ${util.inspect(user)}`);
     const channel = bot.channels.get(data.channel_id);
-    bot.logger.silly(`Channel = ${channel}`);
+    bot.logger.silly(`Channel = ${util.inspect(channel)}`);
 
     if (channel.messages.has(data.message_id)) return; //prevent double emission
+    /* 
+    switch (e.t) {
+        case events.MESSAGE_DELETE: {
+            channel.fetchMessage(data.id).then(msg => {
+                bot.emit(events[e.t], msg);
+            });
+        }
+        case events.MESSAGE_REACTION_ADD: {
+            channel.fetchMessage(data.message_id).then(message => {
+                const emojiKey = data.emoji.id
+                    ? `${data.emoji.name}:${data.emoji.id}`
+                    : data.emoji.name;
 
-    channel.fetchMessage(data.message_id).then(message => {
-        const emojiKey = data.emoji.id
-            ? `${data.emoji.name}:${data.emoji.id}`
-            : data.emoji.name;
+                const reaction = message.reactions.get(emojiKey);
 
-        const reaction = message.reactions.get(emojiKey);
+                bot.emit(events[e.t], reaction, user);
+            });
+        }
+    } */
 
-        bot.emit(events[e.t], reaction, user);
+    channel.fetchMessage(data.message_id || data.id).then(message => {
+        switch (e.t) {
+            case events.MESSAGE_DELETE: {
+                bot.emit(events[e.t], message);
+            }
+            case events.MESSAGE_REACTION_ADD: {
+                const emojiKey = data.emoji.id
+                    ? `${data.emoji.name}:${data.emoji.id}`
+                    : data.emoji.name;
+
+                const reaction = message.reactions.get(emojiKey);
+
+                bot.emit(events[e.t], reaction, user);
+            }
+        }
     });
-});
-
-//starboard events
-bot.on("messageReactionAdd", (reaction, user) => {
-    bot.logger.debug(`Reaction detected on ${reaction.message.guild.name}`);
-
-    var server = reaction.message.guild;
-    if (!bot.myGuilds[server.id].starboard_chan) {
-        bot.logger.warn(`Starboard is not set up for ${server.name}`);
-        return;
-    }
-
-    var guildData = bot.myGuilds[server.id];
-    if (guildData.ignore.includes(reaction.message.channel)) {
-        //woops lol
-    }
-
-    if (
-        reaction.count >= guildData.star_lvl &&
-        reaction.emoji == guildData.star_emoji
-    ) {
-        //do starboard stuff
-        var channel = server.channels.find(
-            chan => chan.id === guildData.starboard_chan
-        );
-        bot.logger.debug(`Channel ${channel}`);
-        var author = reaction.message.member;
-        bot.logger.debug(`Author ${author}`);
-        var text = reaction.message.content;
-        bot.logger.debug(`text ${text}`);
-        var embeds = reaction.message.embeds;
-        bot.logger.debug(`embeds ${embeds}`);
-        var time = reaction.message.createdTimestamp;
-        bot.logger.debug(`time ${time}`);
-
-        var result = new Discord.RichEmbed();
-
-        result.setTimestamp(time);
-        result.setColor(author.displayColor);
-        result.setAuthor(author.displayName, author.user.avatarURL);
-        result.setFooter(server.name);
-        result.setDescription(text);
-        result.setURL(reaction.message.url);
-
-        var e = reaction.message.embeds[0];
-        if (e) {
-            bot.logger.debug(`Found an embed ${e}`);
-            if (e.title) result.setTitle(e.title);
-
-            if (e.thumbnail) result.setThumbnail(e.thumbnail.url);
-
-            if (e.description)
-                result.setDescription(text + "\n\n" + e.description);
-
-            if (e.footer) result.setFooter(e.footer.text);
-
-            if (e.author) result.setAuthor(e.author.name, e.author.icon);
-
-            if (e.color) result.setColor(e.color);
-
-            if (e.image) result.setImage(e.image.url);
-
-            if (e.file) result.attachFile(e.file);
-
-            if (e.files) result.attachFiles(e.files);
-
-            if (e.url) result.setURL(e.url);
-        }
-
-        var att = reaction.message.attachments.first();
-        if (att) {
-            bot.logger.debug(`Found an attachment ${att}`);
-            result.setImage(att.url);
-        }
-
-        if (starredMsgs[reaction.message.id]) {
-            bot.logger.info(
-                `Message was starred already: ${reaction.message.url}`
-            );
-            var id = starredMsgs[reaction.message.id].star_id;
-            channel.messages
-                .find(msg => msg.id === id)
-                .edit(`${reaction.emoji} #${reaction.count}`, result);
-            return;
-        } else {
-            channel
-                .send(`${reaction.emoji} #${reaction.count}`, result)
-                .then(msg => {
-                    starredMsgs[reaction.message.id] = { star_id: msg.id };
-                });
-        }
-    }
-
-    //    bot.commands.get('reactrole').handle(reaction, user);
-
-    updateJSON(starFile, starredMsgs);
 });
 
 //logging stuff
@@ -468,3 +403,8 @@ function JSONtoCollection(obj) {
 }
 
 bot.login(config.token);
+
+bot.updateJSON = updateJSON;
+
+//export the bot so other files can use it
+module.exports = bot;

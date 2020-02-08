@@ -7,6 +7,7 @@
   "dependencies": {
     "@discordjs/uws": "^11.149.1",
     "discord.js": "^11.5.1",
+    "github-api": "^3.3.0",
     "goodreads-api-node": "0.0.10",
     "jimp": "^0.6.8",
     "lodash": "^4.17.15",
