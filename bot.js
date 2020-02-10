@@ -46,6 +46,7 @@ bot.gr_key = config.goodreads_key;
 bot.gr_secret = config.goodreads_secret;
 bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
+bot.events = {};
 
 //set up logging
 bot.logger = Winston.createLogger({
@@ -332,6 +333,34 @@ bot.on("warn", info => {
 
 bot.on("error", info => {
     bot.logger.error(info);
+});
+
+//moderation stuff
+bot.on("messageDelete", message => {
+    try {
+        bot.events.messageDelete(message);
+    } catch (e) {
+        bot.logger.error("Error in messageDelete");
+        bot.logger.error(e);
+    }
+});
+
+bot.on("messageUpdate", (oldM, newM) => {
+    try {
+        bot.events.messageUpdate(oldM, newM);
+    } catch (e) {
+        bot.logger.error("Error in messageDelete");
+        bot.logger.error(e);
+    }
+});
+
+bot.on("guildBanAdd", (guild, user) => {
+    try {
+        bot.events.guildBanAdd(guild, user);
+    } catch (e) {
+        bot.logger.error("Error in messageDelete");
+        bot.logger.error(e);
+    }
 });
 
 //functions
