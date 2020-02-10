@@ -17,7 +17,7 @@ module.exports = {
 };
 
 //look for message deletions
-client.on("messageDelete", message => {
+client.events.messageDelete = message => {
     time = Date.now();
     embed = new Discord.RichEmbed();
     embed.setTitle(`Message Deleted In ${message.channel.name}`);
@@ -33,10 +33,10 @@ client.on("messageDelete", message => {
     } else {
         client.logger.error("Moderation not setup for this server");
     }
-});
+};
 
 //log message edits
-client.on("messageUpdate", (oldM, newM) => {
+client.events.messageUpdate = (oldM, newM) => {
     if (oldM.content === newM.content) return;
     time = Date.now();
     embed = new Discord.RichEmbed();
@@ -53,10 +53,10 @@ client.on("messageUpdate", (oldM, newM) => {
     } else {
         client.logger.error("Moderation not setup for this server");
     }
-});
+};
 
 //log bans
-client.on("guildBanAdd", (guild, user) => {
+client.events.guildBanAdd = (guild, user) => {
     time = Date.now();
     embed = new Discord.RichEmbed();
     embed.setTitle(`${user.tag} Banned`);
@@ -73,7 +73,7 @@ client.on("guildBanAdd", (guild, user) => {
             client.logger.error("Moderation not setup for this server");
         }
     });
-});
+};
 
 //log users leaving and joining
 //TODO
