@@ -1,5 +1,6 @@
 const operations = ["emoji", "channel", "ignore", "threshold"];
 const client = require("../bot.js");
+const Discord = require("discord.js");
 
 module.exports = {
     name: "starboard",
