@@ -349,7 +349,7 @@ bot.on("messageUpdate", (oldM, newM) => {
     try {
         bot.events.messageUpdate(oldM, newM);
     } catch (e) {
-        bot.logger.error("Error in messageDelete");
+        bot.logger.error("Error in messageUpdate");
         bot.logger.error(e);
     }
 });
@@ -358,7 +358,17 @@ bot.on("guildBanAdd", (guild, user) => {
     try {
         bot.events.guildBanAdd(guild, user);
     } catch (e) {
-        bot.logger.error("Error in messageDelete");
+        bot.logger.error("Error in guildBanAdd");
+        bot.logger.error(e);
+    }
+});
+
+//starboard
+bot.on("messageReactionAdd", (reaction, user) => {
+    try {
+        bot.events.onReactionAdd(reaction, user);
+    } catch (e) {
+        bot.logger.error("Error in messageReactionAdd");
         bot.logger.error(e);
     }
 });

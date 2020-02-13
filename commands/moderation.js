@@ -41,7 +41,8 @@ client.events.messageUpdate = (oldM, newM) => {
     time = Date.now();
     embed = new Discord.RichEmbed();
     embed.setTitle(`Message Edited In ${oldM.channel.name}`);
-    embed.setDescription(`${oldM.content} ***===>*** ${newM.content}`);
+    embed.addField("From", oldM.content);
+    embed.addField("To", newM.content);
     embed.setColor(newM.member.displayColor);
     embed.setTimestamp(time);
     embed.setAuthor(oldM.member.displayName, oldM.author.avatarURL);
