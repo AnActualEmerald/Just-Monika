@@ -174,11 +174,11 @@ client.events.onReactionAdd = (reaction, user) => {
             result.setImage(att.url);
         }
 
-        if (starredMsgs[reaction.message.id]) {
+        if (client.starredMsgs[reaction.message.id]) {
             client.logger.info(
                 `Message was starred already: ${reaction.message.url}`
             );
-            var id = starredMsgs[reaction.message.id].star_id;
+            var id = client.starredMsgs[reaction.message.id].star_id;
             channel.messages
                 .find(msg => msg.id === id)
                 .edit(`${reaction.emoji} #${reaction.count}`, result);
@@ -187,12 +187,12 @@ client.events.onReactionAdd = (reaction, user) => {
             channel
                 .send(`${reaction.emoji} #${reaction.count}`, result)
                 .then(msg => {
-                    starredMsgs[reaction.message.id] = { star_id: msg.id };
+                    client.starredMsgs[reaction.message.id] = { star_id: msg.id };
                 });
         }
     }
 
     //    client.commands.get('reactrole').handle(reaction, user);
 
-    client.updateJSON(starFile, starredMsgs);
+    client.updateJSON(starFile, client.starredMsgs);
 };

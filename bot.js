@@ -1,4 +1,4 @@
-var Discord = require("discord.js");
+﻿var Discord = require("discord.js");
 var fs = require("fs");
 var Winston = require("winston");
 var util = require(`util`);
@@ -23,7 +23,6 @@ const myFormat = Winston.format.printf(
 );
 
 //other variables
-var starredMsgs = require(starFile);
 var today = new Date();
 
 //create bot
@@ -47,6 +46,7 @@ bot.gr_secret = config.goodreads_secret;
 bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
 bot.events = {};
+bot.starredMsgs = require(starFile);
 
 //set up logging
 bot.logger = Winston.createLogger({
