@@ -304,20 +304,20 @@ bot.on("raw", (e, m) => {
     } */
 
     channel.fetchMessage(data.message_id || data.id).then(message => {
-        switch (e.t) {
+        /*  switch (e.t) {
             case events.MESSAGE_DELETE: {
                 bot.emit(events[e.t], message);
             }
-            case events.MESSAGE_REACTION_ADD: {
-                const emojiKey = data.emoji.id
-                    ? `${data.emoji.name}:${data.emoji.id}`
-                    : data.emoji.name;
+            case events.MESSAGE_REACTION_ADD: { */
+        const emojiKey = data.emoji.id
+            ? `${data.emoji.name}:${data.emoji.id}`
+            : data.emoji.name;
 
-                const reaction = message.reactions.get(emojiKey);
+        const reaction = message.reactions.get(emojiKey);
 
-                bot.emit(events[e.t], reaction, user);
-            }
-        }
+        bot.emit(events[e.t], reaction, user);
+        // }
+        //}
     });
 });
 
