@@ -36,7 +36,10 @@ module.exports = {
             );
 
             return data.forEach(val => {
-                if (message.mentions.channels) {
+                if (
+                    message.mentions.channels &&
+                    message.member.hasPermission("MANAGE_CHANNELS") //don't want plebs abusing this
+                ) {
                     message.mentions.channels.first().send(val);
                 } else {
                     message.author.send(val).catch(error => {
