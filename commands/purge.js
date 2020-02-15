@@ -4,6 +4,7 @@ module.exports = {
     args: true,
     usage: "<count>",
     perms: ["MANAGE_MESSAGES"],
+    category: "Moderation",
     execute(message, args, bot) {
         count = args.shift();
         channel = message.channel;

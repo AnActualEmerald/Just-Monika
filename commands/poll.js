@@ -8,6 +8,7 @@ module.exports = {
     args: true,
     usage: "<question>; <option 1>; <option 2>; ... <option 10>;",
     cooldown: 5000,
+    category: "Utilities",
     execute(message, args, bot) {
         var options = args.join(" ").split(";");
         var question = new RichEmbed()

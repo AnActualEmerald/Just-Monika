@@ -7,7 +7,7 @@ module.exports = {
         "Refreshes the git repository the bot is running from on the remote server",
     perms: ["OWNER"],
     args: false,
-    category: "management",
+    category: "Management",
     execute(message, args, bot) {
         pullRepo(message, bot);
     }

@@ -9,6 +9,7 @@ module.exports = {
     perms: ["MANAGE_GUILD"],
     args: true,
     usage: "<emoji|channel|ignore|threshold> <param>",
+    category: "Management",
     execute(message, args, bot) {
         var mode = args.shift();
         if (!operations.includes(mode)) {
@@ -187,7 +188,9 @@ client.events.onReactionAdd = (reaction, user) => {
             channel
                 .send(`${reaction.emoji} #${reaction.count}`, result)
                 .then(msg => {
-                    client.starredMsgs[reaction.message.id] = { star_id: msg.id };
+                    client.starredMsgs[reaction.message.id] = {
+                        star_id: msg.id
+                    };
                 });
         }
     }

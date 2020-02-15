@@ -5,6 +5,7 @@ module.exports = {
     args: true,
     usage: "<user> <reason>",
     cooldown: 1500,
+    category: "Moderation",
     execute(message, args, bot) {
         var userID = args
             .shift()

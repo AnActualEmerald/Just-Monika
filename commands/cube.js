@@ -3,6 +3,7 @@ module.exports = {
     alias: [""],
     description: "Have some nice jelly belly pet rat gummy candy",
     usage: "<text>",
+    category: "Fun",
     execute(message, args, bot) {
         let con = args.join(" ").toLowerCase();
         let result = con
