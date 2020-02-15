@@ -9,7 +9,7 @@ module.exports = {
     execute(message, args, bot) {
         let data = [];
         let guild = message.member.guild.id;
-        if (!args.length || message.mentions.channels) {
+        if (!args.length || message.mentions.channels.length > 0) {
             var count = 0;
             var embeds = new Map();
 
@@ -37,7 +37,7 @@ module.exports = {
 
             return data.forEach(val => {
                 if (
-                    message.mentions.channels &&
+                    message.mentions.channels.length > 0 &&
                     message.member.hasPermission("MANAGE_CHANNELS") //don't want plebs abusing this
                 ) {
                     message.mentions.channels.first().send(val);
