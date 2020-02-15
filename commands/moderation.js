@@ -7,6 +7,7 @@ module.exports = {
     args: true,
     description: "Manage the bot's moderation functions",
     usage: "<setup>",
+    category: "Moderation",
     execute(message, args, bot) {
         bot.myGuilds[message.member.guild.id].logChannel = message.channel.id;
         message.channel

@@ -1,10 +1,11 @@
-var thumbsup = '👍';
+var thumbsup = "👍";
 
 module.exports = {
-	name: 'nice',
-	description: 'Thumbs up, bruh',
-	args: false,
-	execute(message, args, bot){
-		message.react(thumbsup).catch(bot.logger.error);
-	},
+    name: "nice",
+    description: "Thumbs up, bruh",
+    args: false,
+    category: "Fun",
+    execute(message, args, bot) {
+        message.react(thumbsup).catch(bot.logger.error);
+    }
 };

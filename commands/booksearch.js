@@ -10,6 +10,7 @@ module.exports = {
     description: "Searches www.goodreads.com for a book by title",
     cooldown: 1500,
     usage: "<title>",
+    category: "Utilities",
     execute(message, args, bot) {
         var q_string = args.join(" ");
         message.channel.startTyping();
