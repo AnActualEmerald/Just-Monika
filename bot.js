@@ -47,6 +47,7 @@ bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
 bot.events = {};
 bot.starredMsgs = require(starFile);
+bot.hugs = 0;
 
 //set up logging
 bot.logger = Winston.createLogger({
@@ -92,6 +93,10 @@ String.prototype.interpolate = function(params) {
 
 bot.on("ready", () => {
     loadCmds();
+
+    fs.readdir("./commands/data/hugs", (err, files) => {
+        bot.hugs = files.length;
+    });
 
     bot.logger.info("Bot start");
 
