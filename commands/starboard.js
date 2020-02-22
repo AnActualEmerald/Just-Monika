@@ -2,11 +2,115 @@ const operations = ["emoji", "channel", "ignore", "threshold"];
 const client = require("../bot.js");
 const Discord = require("discord.js");
 
+emoji = {
+    name: "emoji",
+    args: true,
+    description: "Change the emoji used for starboard detection",
+    execute(message, args, bot) {
+        var emoji = args.shift();
+        bot.myGuilds[message.guild.id].star_emoji = emoji;
+        bot.logger.info(
+            `Set starboard emoji for ${message.guild.name} to ${emoji.name}`
+        );
+        message.channel.send(`Set starboard emoji to ${emoji}`);
+    }
+};
+
+channel = {
+    name: "channel",
+    args: true,
+    description: "Change the channel starboard messages are sent to",
+    execute(message, args, bot) {
+        var chan = args.shift();
+        if (chan) {
+            bot.myGuilds[message.guild.id].starboard_chan = chan.id;
+            bot.logger.info(
+                `Set starboard channel for ${message.guild.name} to ${chan.id}`
+            );
+            message.channel.send(`Starboard channel set to ${chan}`);
+        } else {
+            bot.myGuilds[message.guild.id].starboard_chan = message.channel.id;
+            bot.logger.info(
+                `Set starborad channel for ${message.guild.name} to ${message.channel.name}`
+            );
+            message.channel.send(`Starboard channel set to ${message.channel}`);
+        }
+    }
+};
+
+threshold = {
+    name: "threshold",
+    args: true,
+    description:
+        "Sets the number of reactions needed to make it to the starboard",
+    execute(message, args, bot) {
+        var count = args.shift();
+        bot.myGuilds[message.guild.id].star_lvl = count;
+        bot.logger.info(
+            `Set starboard threshold in ${message.guild.name} to ${count}`
+        );
+        message.channel.send(`Starboard now requires ${count} reactions`);
+    }
+};
+
+ignore = {
+    name: "ignore",
+    args: true,
+    description: "Make the bot ignore a channel for starboard reactions",
+    execute(message, args, bot) {
+        var chan = args.shift();
+
+        if (chan) {
+            if (bot.myGuilds[message.guild.id].ignore.includes(chan)) {
+                var i = bot.myGuilds[message.guild.id].ignore.indexOf(
+                    chan.name
+                );
+                bot.myGuilds[message.guild.id].ignore.splice(i);
+                bot.logger.info(`Enabled starboard for ${chan}`);
+                message.channel.send(`Enabled starboard in ${chan}`);
+            } else {
+                bot.myGuilds[message.guild.id].ignore.push(chan);
+                bot.logger.info(
+                    `Starboard disabled for ${message.guild.name} channel ${message.channel}`
+                );
+                message.channel.send(`Starboard disabled in ${chan}`);
+            }
+        } else {
+            if (
+                bot.myGuilds[message.guild.id].ignore.includes(
+                    message.channel.id
+                )
+            ) {
+                var i = bot.myGuilds[message.guild.id].ignore.indexOf(
+                    message.channel.id
+                );
+                bot.myGuilds[message.guild.id].ignore.splice(i);
+                bot.logger.info(`Enabled starboard for ${message.channel}`);
+                message.channel.send(`Enabled starboard in ${message.channel}`);
+            } else {
+                bot.myGuilds[message.guild.id].ignore.push(message.channel.id);
+                bot.logger.info(
+                    `Starboard disabled for ${message.guild.name} channel ${message.channel}`
+                );
+                message.channel.send(
+                    `Starboard disabled in ${message.channel}`
+                );
+            }
+        }
+    }
+};
+
 module.exports = {
     name: "starboard",
-    alias: ["setstar", "setstaremoji"],
+    alias: [],
     description: "Starboard manager. See documentation for detailed info",
     perms: ["MANAGE_GUILD"],
+    subcommands: {
+        emoji: emoji,
+        channel: channel,
+        ignore: ignore,
+        threshold: threshold
+    },
     args: true,
     usage: "<emoji|channel|ignore|threshold> <param>",
     category: "Management",
@@ -18,87 +122,19 @@ module.exports = {
         }
 
         if (mode == operations[0]) {
-            var emoji = args.shift();
-            bot.myGuilds[message.guild.id].star_emoji = emoji;
-            bot.logger.info(
-                `Set starboard emoji for ${message.guild.name} to ${emoji.name}`
-            );
-            message.channel.send(`Set starboard emoji to ${emoji}`);
+            bot.logger.debug("Emoji should have fired");
         }
 
         if (mode == operations[1]) {
-            var chan = args.shift();
-            if (chan) {
-                bot.myGuilds[message.guild.id].starboard_chan = chan.id;
-                bot.logger.info(
-                    `Set starboard channel for ${message.guild.name} to ${chan.id}`
-                );
-                message.channel.send(`Starboard channel set to ${chan}`);
-            } else {
-                bot.myGuilds[message.guild.id].starboard_chan =
-                    message.channel.id;
-                bot.logger.info(
-                    `Set starborad channel for ${message.guild.name} to ${message.channel.name}`
-                );
-                message.channel.send(
-                    `Starboard channel set to ${message.channel}`
-                );
-            }
+            bot.logger.debug("Channel should have fired");
         }
 
         if (mode == operations[2]) {
-            var chan = args.shift();
-
-            if (chan) {
-                if (bot.myGuilds[message.guild.id].ignore.includes(chan)) {
-                    var i = bot.myGuilds[message.guild.id].ignore.indexOf(
-                        chan.name
-                    );
-                    bot.myGuilds[message.guild.id].ignore.splice(i);
-                    bot.logger.info(`Enabled starboard for ${chan}`);
-                    message.channel.send(`Enabled starboard in ${chan}`);
-                } else {
-                    bot.myGuilds[message.guild.id].ignore.push(chan);
-                    bot.logger.info(
-                        `Starboard disabled for ${message.guild.name} channel ${message.channel}`
-                    );
-                    message.channel.send(`Starboard disabled in ${chan}`);
-                }
-            } else {
-                if (
-                    bot.myGuilds[message.guild.id].ignore.includes(
-                        message.channel.id
-                    )
-                ) {
-                    var i = bot.myGuilds[message.guild.id].ignore.indexOf(
-                        message.channel.id
-                    );
-                    bot.myGuilds[message.guild.id].ignore.splice(i);
-                    bot.logger.info(`Enabled starboard for ${message.channel}`);
-                    message.channel.send(
-                        `Enabled starboard in ${message.channel}`
-                    );
-                } else {
-                    bot.myGuilds[message.guild.id].ignore.push(
-                        message.channel.id
-                    );
-                    bot.logger.info(
-                        `Starboard disabled for ${message.guild.name} channel ${message.channel}`
-                    );
-                    message.channel.send(
-                        `Starboard disabled in ${message.channel}`
-                    );
-                }
-            }
+            bot.logger.debug("Ignore should have fired");
         }
 
         if (mode == operations[3]) {
-            var count = args.shift();
-            bot.myGuilds[message.guild.id].star_lvl = count;
-            bot.logger.info(
-                `Set starboard threshold in ${message.guild.name} to ${count}`
-            );
-            message.channel.send(`Starboard now requires ${count} reactions`);
+            bot.logger.debug("Threshold should have fired");
         }
     }
 };

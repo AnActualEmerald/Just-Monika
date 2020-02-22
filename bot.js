@@ -165,14 +165,16 @@ bot.on("message", message => {
     if (message.content.startsWith(prefix)) {
         bot.logger.info("Command string: " + message.content);
 
-        const args = message.content.slice(prefix.length).split(/ +/);
-        const cmdName = args.shift().toLowerCase();
+        let args = message.content.slice(prefix.length).split(/ +/);
+        let cmdName = args.shift().toLowerCase();
 
         bot.logger.debug(args);
 
         const com =
             bot.commands.get(cmdName) ||
             bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
+
+        let exe = com;
 
         if (bot.customComs.has(cmdName))
             return message.channel.send(bot.customComs.get(cmdName));
@@ -188,6 +190,13 @@ bot.on("message", message => {
                 setTimeout(function() {
                     bot.coolDowns.delete(message.member.id);
                 }, com.cooldown);
+            }
+        }
+
+        //check to see if we should be running a subcommand
+        if (com.subcommands) {
+            if (com.subcommands[args[0]]) {
+                exe = com.subcommands[args.shift()];
             }
         }
 
@@ -212,7 +221,7 @@ bot.on("message", message => {
 
         try {
             if (perms.includes(true)) {
-                com.execute(message, args, bot);
+                exe.execute(message, args, bot);
             } else {
                 message.reply("You don't have permission to use that command");
             }
