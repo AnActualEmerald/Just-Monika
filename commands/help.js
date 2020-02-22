@@ -10,7 +10,7 @@ module.exports = {
         let data = [];
         let guild = message.member.guild.id;
         if (!args.length || message.mentions.channels) {
-            var count = 0;
+            var count = {};
             var embeds = new Map();
 
             bot.commands.forEach((value, key) => {
@@ -20,12 +20,20 @@ module.exports = {
 
                 if (embeds.has(value.category)) {
                     embeds.get(value.category).addField(key, value.description);
+                    count[value.category] += 1;
                 } else {
                     let tmp = new RichEmbed()
                         .setTitle(value.category)
                         .addField(key, value.description)
                         .setThumbnail(bot.user.avatarURL);
                     embeds.set(value.category, tmp);
+                    count[value.category] = 1;
+                }
+                if (count[value.category] >= 25) {
+                    let e = embeds.get(value.category);
+                    embeds.delete(value.category);
+                    data.push(e.setColor(message.member.displayColor));
+                    count[value.category] = 0;
                 }
             });
             embeds.forEach((value, key) => {
