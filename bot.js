@@ -352,7 +352,7 @@ bot.on("error", info => {
 //moderation stuff
 bot.on("messageDelete", message => {
     try {
-        bot.events.messageDelete(message);
+        bot.events["messageDelete"].forEach(e => e(message));
     } catch (e) {
         bot.logger.error("Error in messageDelete");
         bot.logger.error(e);
@@ -361,7 +361,7 @@ bot.on("messageDelete", message => {
 
 bot.on("messageUpdate", (oldM, newM) => {
     try {
-        bot.events.messageUpdate(oldM, newM);
+        bot.events["messageUpdate"].forEach(e => e(oldM, newM));
     } catch (e) {
         bot.logger.error("Error in messageUpdate");
         bot.logger.error(e);
@@ -370,7 +370,7 @@ bot.on("messageUpdate", (oldM, newM) => {
 
 bot.on("guildBanAdd", (guild, user) => {
     try {
-        bot.events.guildBanAdd(guild, user);
+        bot.events["guildBanAdd"].forEach(e => e(guild, user));
     } catch (e) {
         bot.logger.error("Error in guildBanAdd");
         bot.logger.error(e);
@@ -380,7 +380,7 @@ bot.on("guildBanAdd", (guild, user) => {
 //starboard
 bot.on("messageReactionAdd", (reaction, user) => {
     try {
-        bot.events.onReactionAdd(reaction, user);
+        bot.events["messageReactionAdd"].forEach(e => e(reaction, user));
     } catch (e) {
         bot.logger.error("Error in messageReactionAdd");
         bot.logger.error(e);
@@ -458,6 +458,16 @@ function JSONtoCollection(obj) {
 bot.login(config.token);
 
 bot.updateJSON = updateJSON;
+
+bot.addEventListener = (event, func) => {
+    if (bot.events[event]) {
+        bot.events[event].push(func);
+        bot.logger.info(`Created listener for ${event}`);
+    } else {
+        bot.events[event] = [func];
+        bot.logger.info(`Added listener for ${event}`);
+    }
+};
 
 //export the bot so other files can use it
 module.exports = bot;
