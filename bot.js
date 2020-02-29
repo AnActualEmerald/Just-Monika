@@ -8,7 +8,6 @@ const guildFile = "./guilds.json";
 const configFile = "./config.json";
 const usersFile = "./users.json";
 const varFile = "./commands/cmdVars.json";
-const sayingsFile = "./commands.json";
 const ccFile = "./commands/customCommands.json";
 const starFile = "./starboard.json";
 
@@ -43,7 +42,6 @@ bot.userVars = require(usersFile);
 bot.auth = config.token;
 bot.gr_key = config.goodreads_key;
 bot.gr_secret = config.goodreads_secret;
-bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
 bot.events = {};
 bot.starredMsgs = require(starFile);
@@ -232,28 +230,6 @@ bot.on("message", message => {
         }
     }
 
-    /* 
-    for (var s in bot.sayings) {
-        var cont = message.content;
-        if (!bot.sayings[s].sens) {
-            cont = cont.toLowerCase();
-        }
-        if (!cont.startsWith(s)) continue;
-        var trigger = cont.substring(0, s.length);
-        bot.logger.silly(`trigger = ${trigger}`);
-        var rest = cont.substring(s.length);
-        bot.logger.silly(`rest = ${rest}`);
-        if (trigger == s) {
-            bot.logger.debug();
-            if (rest) {
-                if (rest.startsWith(" "))
-                    message.channel.send(bot.sayings[s].text);
-            } else {
-                message.channel.send(bot.sayings[s].text);
-            }
-        }
-    } */
-
     if (!bot.userVars[message.author]) {
         bot.userVars[message.author] = 0;
     }
@@ -263,7 +239,6 @@ bot.on("message", message => {
     updateJSON(usersFile, bot.userVars);
 
     updateJSON(varFile, bot.globalVar);
-    updateJSON(sayingsFile, bot.sayings);
     updateJSON(guildFile, bot.myGuilds);
 });
 
@@ -352,7 +327,7 @@ bot.on("error", info => {
 //moderation stuff
 bot.on("messageDelete", message => {
     try {
-        bot.events.messageDelete(message);
+        bot.events["messageDelete"].forEach(e => e(message));
     } catch (e) {
         bot.logger.error("Error in messageDelete");
         bot.logger.error(e);
@@ -361,7 +336,7 @@ bot.on("messageDelete", message => {
 
 bot.on("messageUpdate", (oldM, newM) => {
     try {
-        bot.events.messageUpdate(oldM, newM);
+        bot.events["messageUpdate"].forEach(e => e(oldM, newM));
     } catch (e) {
         bot.logger.error("Error in messageUpdate");
         bot.logger.error(e);
@@ -370,7 +345,7 @@ bot.on("messageUpdate", (oldM, newM) => {
 
 bot.on("guildBanAdd", (guild, user) => {
     try {
-        bot.events.guildBanAdd(guild, user);
+        bot.events["guildBanAdd"].forEach(e => e(guild, user));
     } catch (e) {
         bot.logger.error("Error in guildBanAdd");
         bot.logger.error(e);
@@ -380,9 +355,18 @@ bot.on("guildBanAdd", (guild, user) => {
 //starboard
 bot.on("messageReactionAdd", (reaction, user) => {
     try {
-        bot.events.onReactionAdd(reaction, user);
+        bot.events["messageReactionAdd"].forEach(e => e(reaction, user));
     } catch (e) {
         bot.logger.error("Error in messageReactionAdd");
+        bot.logger.error(e);
+    }
+});
+
+bot.on("messageReactionRemove", (reaction, user) => {
+    try {
+        bot.events["messageReactionRemove"].forEach(e => e(reaction, user));
+    } catch (e) {
+        bot.logger.error("Error in messageReactionRemove");
         bot.logger.error(e);
     }
 });
@@ -404,6 +388,8 @@ function updateJSON(fileName, data, cooked) {
 }
 
 function loadCmds(message) {
+    bot.events = {};
+
     const commandFiles = fs
         .readdirSync("./commands")
         .filter(file => file.endsWith(".js"));
@@ -412,6 +398,7 @@ function loadCmds(message) {
         try {
             delete require.cache[require.resolve(`./commands/${file}`)];
             const command = require(`./commands/${file}`);
+            if (command.load) command.load();
             bot.commands.set(command.name, command);
         } catch (e) {
             bot.logger.error(e);
@@ -458,6 +445,16 @@ function JSONtoCollection(obj) {
 bot.login(config.token);
 
 bot.updateJSON = updateJSON;
+
+bot.addEventListener = (event, func) => {
+    if (bot.events[event]) {
+        bot.events[event].push(func);
+        bot.logger.info(`Created listener for ${event}`);
+    } else {
+        bot.events[event] = [func];
+        bot.logger.info(`Added listener for ${event}`);
+    }
+};
 
 //export the bot so other files can use it
 module.exports = bot;
