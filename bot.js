@@ -8,7 +8,6 @@ const guildFile = "./guilds.json";
 const configFile = "./config.json";
 const usersFile = "./users.json";
 const varFile = "./commands/cmdVars.json";
-const sayingsFile = "./commands.json";
 const ccFile = "./commands/customCommands.json";
 const starFile = "./starboard.json";
 
@@ -43,7 +42,6 @@ bot.userVars = require(usersFile);
 bot.auth = config.token;
 bot.gr_key = config.goodreads_key;
 bot.gr_secret = config.goodreads_secret;
-bot.sayings = require(sayingsFile);
 bot.ccFile = ccFile;
 bot.events = {};
 bot.starredMsgs = require(starFile);
@@ -232,28 +230,6 @@ bot.on("message", message => {
         }
     }
 
-    /* 
-    for (var s in bot.sayings) {
-        var cont = message.content;
-        if (!bot.sayings[s].sens) {
-            cont = cont.toLowerCase();
-        }
-        if (!cont.startsWith(s)) continue;
-        var trigger = cont.substring(0, s.length);
-        bot.logger.silly(`trigger = ${trigger}`);
-        var rest = cont.substring(s.length);
-        bot.logger.silly(`rest = ${rest}`);
-        if (trigger == s) {
-            bot.logger.debug();
-            if (rest) {
-                if (rest.startsWith(" "))
-                    message.channel.send(bot.sayings[s].text);
-            } else {
-                message.channel.send(bot.sayings[s].text);
-            }
-        }
-    } */
-
     if (!bot.userVars[message.author]) {
         bot.userVars[message.author] = 0;
     }
@@ -263,7 +239,6 @@ bot.on("message", message => {
     updateJSON(usersFile, bot.userVars);
 
     updateJSON(varFile, bot.globalVar);
-    updateJSON(sayingsFile, bot.sayings);
     updateJSON(guildFile, bot.myGuilds);
 });
 
@@ -387,6 +362,15 @@ bot.on("messageReactionAdd", (reaction, user) => {
     }
 });
 
+bot.on("messageReactionRemove", (reaction, user) => {
+    try {
+        bot.events["messageReactionRemove"].forEach(e => e(reaction, user));
+    } catch (e) {
+        bot.logger.error("Error in messageReactionRemove");
+        bot.logger.error(e);
+    }
+});
+
 //functions
 
 function updateJSON(fileName, data, cooked) {
@@ -404,6 +388,8 @@ function updateJSON(fileName, data, cooked) {
 }
 
 function loadCmds(message) {
+    bot.events = {};
+
     const commandFiles = fs
         .readdirSync("./commands")
         .filter(file => file.endsWith(".js"));
@@ -412,6 +398,7 @@ function loadCmds(message) {
         try {
             delete require.cache[require.resolve(`./commands/${file}`)];
             const command = require(`./commands/${file}`);
+            if (command.load) command.load();
             bot.commands.set(command.name, command);
         } catch (e) {
             bot.logger.error(e);

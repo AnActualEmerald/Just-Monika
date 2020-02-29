@@ -1,16 +1,10 @@
 const client = require("../bot.js");
-
-let sentMsgs = [];
+let sentMsgs = require("../messages.json");
 
 let roleMsg = {
     message: "",
     roles: []
 };
-
-/* let roleObj = {
-    role,
-    emoji
-}; */
 
 newmsg = {
     execute(message, args, bot) {
@@ -39,7 +33,11 @@ send = {
             thisRoleMsg.roles.forEach(elem => {
                 m.react(elem.emoji);
             });
-            sentMsgs.push({ id: m.id, msg: thisRoleMsg });
+            sentMsgs[m.id] = {
+                id: m.id,
+                roles: thisRoleMsg.roles
+            };
+            client.updateJSON("./messages.json", sentMsgs);
             client.addEventListener("messageReactionAdd", (reaction, user) => {
                 if (reaction.message.id === m.id) {
                     thisRoleMsg.roles.forEach(e => {
@@ -52,6 +50,21 @@ send = {
                     });
                 }
             });
+            client.addEventListener(
+                "messageReactionRemove",
+                (reaction, user) => {
+                    if (reaction.message.id === m.id) {
+                        thisRoleMsg.roles.forEach(e => {
+                            if (reaction.emoji == e.emoji && !user.bot) {
+                                reaction.message.guild
+                                    .fetchMember(user)
+                                    .then(member => member.removeRole(e.role));
+                                user.send(`I removed the ${e.role.name} role`);
+                            }
+                        });
+                    }
+                }
+            );
         });
     }
 };
@@ -62,7 +75,47 @@ module.exports = {
     category: "Utilities",
     args: true,
     description: "set up and send reaction role messages",
-    subcommands: { send: send, role: role, newmsg: newmsg },
+    subcommands: { send: send, role: role, new: newmsg },
     execute(message, args, bot) {},
-    reload() {}
+    load() {
+        for (i in sentMsgs) {
+            let roleObj = sentMsgs[i];
+            client.logger.info("Looping");
+            client.addEventListener("messageReactionAdd", (reaction, user) => {
+                client.logger.info("Tripping");
+                client.logger.info(
+                    `React ID: ${reaction.message.id}, old msg ID: ${roleObj.id}`
+                );
+                if (reaction.message.id === roleObj.id) {
+                    client.logger.info("ID matching");
+                    roleObj.roles.forEach(e => {
+                        client.logger.info("Looping again");
+                        if (reaction.emoji == e.emoji && !user.bot) {
+                            reaction.message.guild
+                                .fetchMember(user)
+                                .then(member => {
+                                    member.addRole(e.role);
+                                });
+                            user.send(`I gave you the ${e.role.name} role`);
+                        }
+                    });
+                }
+            });
+            client.addEventListener(
+                "messageReactionRemove",
+                (reaction, user) => {
+                    if (reaction.message.id === roleObj.id) {
+                        roleObj.roles.forEach(e => {
+                            if (reaction.emoji == e.emoji && !user.bot) {
+                                reaction.message.guild
+                                    .fetchMember(user)
+                                    .then(member => member.removeRole(e.role));
+                                user.send(`I removed the ${e.role.name} role`);
+                            }
+                        });
+                    }
+                }
+            );
+        }
+    }
 };
