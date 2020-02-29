@@ -1,6 +1,6 @@
-const operations = ["emoji", "channel", "ignore", "threshold"];
 const client = require("../bot.js");
 const Discord = require("discord.js");
+const starFile = "./starboard.json";
 
 emoji = {
     name: "emoji",
@@ -115,123 +115,110 @@ module.exports = {
     usage: "<emoji|channel|ignore|threshold> <param>",
     category: "Management",
     execute(message, args, bot) {
-        var mode = args.shift();
-        if (!operations.includes(mode)) {
-            bot.logger.warn(`Invalid starboard operation: ${mode}`);
-            message.channel.send(`${mode} isn't a valid operation!`);
-        }
-
-        if (mode == operations[0]) {
-            bot.logger.debug("Emoji should have fired");
-        }
-
-        if (mode == operations[1]) {
-            bot.logger.debug("Channel should have fired");
-        }
-
-        if (mode == operations[2]) {
-            bot.logger.debug("Ignore should have fired");
-        }
-
-        if (mode == operations[3]) {
-            bot.logger.debug("Threshold should have fired");
-        }
-    }
-};
-
-client.events.onReactionAdd = (reaction, user) => {
-    client.logger.debug(`Reaction detected on ${reaction.message.guild.name}`);
-
-    var server = reaction.message.guild;
-    if (!client.myGuilds[server.id].starboard_chan) {
-        client.logger.warn(`Starboard is not set up for ${server.name}`);
-        return;
-    }
-
-    var guildData = client.myGuilds[server.id];
-    if (guildData.ignore.includes(reaction.message.channel)) {
-        //woops lol
-    }
-
-    if (
-        reaction.count >= guildData.star_lvl &&
-        reaction.emoji == guildData.star_emoji
-    ) {
-        //do starboard stuff
-        var channel = server.channels.find(
-            chan => chan.id === guildData.starboard_chan
-        );
-        client.logger.debug(`Channel ${channel}`);
-        var author = reaction.message.member;
-        client.logger.debug(`Author ${author}`);
-        var text = reaction.message.content;
-        client.logger.debug(`text ${text}`);
-        var embeds = reaction.message.embeds;
-        client.logger.debug(`embeds ${embeds}`);
-        var time = reaction.message.createdTimestamp;
-        client.logger.debug(`time ${time}`);
-
-        var result = new Discord.RichEmbed();
-
-        result.setTimestamp(time);
-        result.setColor(author.displayColor);
-        result.setAuthor(author.displayName, author.user.avatarURL);
-        result.setFooter(server.name);
-        result.setDescription(text);
-        result.setURL(reaction.message.url);
-
-        var e = reaction.message.embeds[0];
-        if (e) {
-            client.logger.debug(`Found an embed ${e}`);
-            if (e.title) result.setTitle(e.title);
-
-            if (e.thumbnail) result.setThumbnail(e.thumbnail.url);
-
-            if (e.description)
-                result.setDescription(text + "\n\n" + e.description);
-
-            if (e.footer) result.setFooter(e.footer.text);
-
-            if (e.author) result.setAuthor(e.author.name, e.author.icon);
-
-            if (e.color) result.setColor(e.color);
-
-            if (e.image) result.setImage(e.image.url);
-
-            if (e.file) result.attachFile(e.file);
-
-            if (e.files) result.attachFiles(e.files);
-
-            if (e.url) result.setURL(e.url);
-        }
-
-        var att = reaction.message.attachments.first();
-        if (att) {
-            client.logger.debug(`Found an attachment ${att}`);
-            result.setImage(att.url);
-        }
-
-        if (client.starredMsgs[reaction.message.id]) {
-            client.logger.info(
-                `Message was starred already: ${reaction.message.url}`
+        let prefix = bot.myGuilds[message.member.guild.id].prefix;
+        message.reply(`Do ${prefix}help starboard for help with this command`);
+    },
+    load() {
+        client.addEventListener("messageReactionAdd", (reaction, user) => {
+            client.logger.debug(
+                `Reaction detected on ${reaction.message.guild.name}`
             );
-            var id = client.starredMsgs[reaction.message.id].star_id;
-            channel.messages
-                .find(msg => msg.id === id)
-                .edit(`${reaction.emoji} #${reaction.count}`, result);
-            return;
-        } else {
-            channel
-                .send(`${reaction.emoji} #${reaction.count}`, result)
-                .then(msg => {
-                    client.starredMsgs[reaction.message.id] = {
-                        star_id: msg.id
-                    };
-                });
-        }
+
+            var server = reaction.message.guild;
+            if (!client.myGuilds[server.id].starboard_chan) {
+                client.logger.warn(
+                    `Starboard is not set up for ${server.name}`
+                );
+                return;
+            }
+
+            var guildData = client.myGuilds[server.id];
+            if (guildData.ignore.includes(reaction.message.channel)) {
+                //woops lol
+            }
+
+            if (
+                reaction.count >= guildData.star_lvl &&
+                reaction.emoji == guildData.star_emoji
+            ) {
+                //do starboard stuff
+                var channel = server.channels.find(
+                    chan => chan.id === guildData.starboard_chan
+                );
+                client.logger.debug(`Channel ${channel}`);
+                var author = reaction.message.member;
+                client.logger.debug(`Author ${author}`);
+                var text = reaction.message.content;
+                client.logger.debug(`text ${text}`);
+                var embeds = reaction.message.embeds;
+                client.logger.debug(`embeds ${embeds}`);
+                var time = reaction.message.createdTimestamp;
+                client.logger.debug(`time ${time}`);
+
+                var result = new Discord.RichEmbed();
+
+                result.setTimestamp(time);
+                result.setColor(author.displayColor);
+                result.setAuthor(author.displayName, author.user.avatarURL);
+                result.setFooter(server.name);
+                result.setDescription(text);
+                result.setURL(reaction.message.url);
+
+                var e = reaction.message.embeds[0];
+                if (e) {
+                    client.logger.debug(`Found an embed ${e}`);
+                    if (e.title) result.setTitle(e.title);
+
+                    if (e.thumbnail) result.setThumbnail(e.thumbnail.url);
+
+                    if (e.description)
+                        result.setDescription(text + "\n\n" + e.description);
+
+                    if (e.footer) result.setFooter(e.footer.text);
+
+                    if (e.author)
+                        result.setAuthor(e.author.name, e.author.icon);
+
+                    if (e.color) result.setColor(e.color);
+
+                    if (e.image) result.setImage(e.image.url);
+
+                    if (e.file) result.attachFile(e.file);
+
+                    if (e.files) result.attachFiles(e.files);
+
+                    if (e.url) result.setURL(e.url);
+                }
+
+                var att = reaction.message.attachments.first();
+                if (att) {
+                    client.logger.debug(`Found an attachment ${att}`);
+                    result.setImage(att.url);
+                }
+
+                if (client.starredMsgs[reaction.message.id]) {
+                    client.logger.info(
+                        `Message was starred already: ${reaction.message.url}`
+                    );
+                    var id = client.starredMsgs[reaction.message.id].star_id;
+                    channel.messages
+                        .find(msg => msg.id === id)
+                        .edit(`${reaction.emoji} #${reaction.count}`, result);
+                    return;
+                } else {
+                    channel
+                        .send(`${reaction.emoji} #${reaction.count}`, result)
+                        .then(msg => {
+                            client.starredMsgs[reaction.message.id] = {
+                                star_id: msg.id
+                            };
+                        });
+                }
+            }
+
+            //    client.commands.get('reactrole').handle(reaction, user);
+
+            client.updateJSON(starFile, client.starredMsgs);
+        });
     }
-
-    //    client.commands.get('reactrole').handle(reaction, user);
-
-    client.updateJSON(starFile, client.starredMsgs);
 };

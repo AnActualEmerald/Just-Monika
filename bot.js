@@ -374,6 +374,8 @@ bot.on("messageReactionRemove", (reaction, user) => {
 //functions
 
 function updateJSON(fileName, data, cooked) {
+    bot.logger.debug(`Saving JSON to ${fileName}`);
+
     if (!cooked) {
         data = JSON.stringify(data);
     }
