@@ -65,7 +65,7 @@ ignore = {
                 var i = bot.myGuilds[message.guild.id].ignore.indexOf(
                     chan.name
                 );
-                bot.myGuilds[message.guild.id].ignore.splice(i);
+                delete bot.myGuilds[message.guild.id].ignore[i];
                 bot.logger.info(`Enabled starboard for ${chan}`);
                 message.channel.send(`Enabled starboard in ${chan}`);
             } else {
@@ -84,7 +84,7 @@ ignore = {
                 var i = bot.myGuilds[message.guild.id].ignore.indexOf(
                     message.channel.id
                 );
-                bot.myGuilds[message.guild.id].ignore.splice(i);
+                delete bot.myGuilds[message.guild.id].ignore[i];
                 bot.logger.info(`Enabled starboard for ${message.channel}`);
                 message.channel.send(`Enabled starboard in ${message.channel}`);
             } else {
@@ -114,6 +114,11 @@ module.exports = {
     args: true,
     usage: "<emoji|channel|ignore|threshold> <param>",
     category: "Management",
+    detailed:
+        "**Emoji:** sets the emoji the bot will listen for to send messages to the starboard ***!the bot must have access to the emoji to be able to listen for it!*** (eg: !starboard emoji :heart:)\n" +
+        "**Channel:** set what channel the bot will use as the starboard. If no channel is provided, the channel the command was send in will be used instead (eg: !starboard channel #starboard)\n" +
+        "**Ignore:** if you don't want the bot to listen in a certain channel, call this command there or provide it as an argument (eg: !starboard ignore #secret-admin-channel)\n" +
+        "**Threshold:** sets the number of emoji reactions a message needs to get to be sent to the starboard channel",
     execute(message, args, bot) {
         let prefix = bot.myGuilds[message.member.guild.id].prefix;
         message.reply(`Do ${prefix}help starboard for help with this command`);

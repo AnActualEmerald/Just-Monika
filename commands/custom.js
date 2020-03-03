@@ -67,6 +67,11 @@ module.exports = {
     alias: [`cc`],
     usage: `<add|remove|edit|list> <command name> | <command text>`,
     category: "Utilities",
+    detailed:
+        "Add: add a new custom command (eg: !custom add hellothere genral kenobi)\n" +
+        "Remove: remove a custom command by name (eg: !custom remove hellothere)\n" +
+        "Edit: change the response a command gives when called (eg: !custom edit hellothere you are a bold one)\n" +
+        "List: list all of the current custom commands, currently a global list for every server (eg: !custom list)",
     execute(message, args, bot) {
         var mode = args.shift();
         //     if (!operations.includes(mode)) {
