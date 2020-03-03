@@ -1,6 +1,6 @@
 {
-  "name": "@justmonika",
-  "version": "1.0.0",
+  "name": "justmonika",
+  "version": "0.0.6",
   "description": "Just tryna make a bot for a server",
   "main": "bot.js",
   "author": "Emerald",
@@ -19,6 +19,8 @@
     "xml2js": "^0.4.22"
   },
   "devDependencies": {},
-  "scripts": {},
+  "scripts": {
+    "start":"node ./bot.js"
+  },
   "license": "ISC"
 }

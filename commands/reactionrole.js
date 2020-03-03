@@ -69,13 +69,27 @@ send = {
     }
 };
 
+remove = {
+    execute(message, args, bot) {
+        let id = args.shift();
+        delete sentMsgs[id];
+        client.updateJSON("./messages.json", sentMsgs);
+        client.commands.get("reload").execute(message, args, bot);
+    }
+};
+
 module.exports = {
     name: "reactionrole",
     alias: ["rr"],
     category: "Utilities",
     args: true,
     description: "set up and send reaction role messages",
-    subcommands: { send: send, role: role, new: newmsg },
+    subcommands: {
+        send: send,
+        role: role,
+        new: newmsg,
+        remove: remove
+    },
     execute(message, args, bot) {},
     load() {
         for (i in sentMsgs) {
@@ -94,7 +108,7 @@ module.exports = {
                             reaction.message.guild
                                 .fetchMember(user)
                                 .then(member => {
-                                    member.addRole(e.role);
+                                    member.addRole(e.role.id);
                                 });
                             user.send(`I gave you the ${e.role.name} role`);
                         }
@@ -109,7 +123,9 @@ module.exports = {
                             if (reaction.emoji == e.emoji && !user.bot) {
                                 reaction.message.guild
                                     .fetchMember(user)
-                                    .then(member => member.removeRole(e.role));
+                                    .then(member =>
+                                        member.removeRole(e.role.id)
+                                    );
                                 user.send(`I removed the ${e.role.name} role`);
                             }
                         });

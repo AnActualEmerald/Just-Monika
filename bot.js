@@ -154,9 +154,10 @@ bot.on("message", message => {
         return handleDM(message);
     }
 
-    let guild = message.member.guild.id;
+    //TODO: Figure out what is actually happening here
+    let guild = message.member.guild ? message.member.guild.id : 0;
 
-    if (message.author.bot) return;
+    if (message.author.bot || guild == 0) return;
 
     let prefix = bot.myGuilds[guild].prefix;
     //listen for commands starting with the prefix
