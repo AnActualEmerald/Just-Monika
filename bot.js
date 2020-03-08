@@ -1,7 +1,7 @@
 ﻿var Discord = require("discord.js");
 var fs = require("fs");
 var Winston = require("winston");
-var util = require(`util`);
+var util = require("util"); 
 
 //file locations
 const guildFile = "./guilds.json";
@@ -325,34 +325,6 @@ bot.on("error", info => {
     bot.logger.error(info);
 });
 
-//moderation stuff
-bot.on("messageDelete", message => {
-    try {
-        bot.events["messageDelete"].forEach(e => e(message));
-    } catch (e) {
-        bot.logger.error("Error in messageDelete");
-        bot.logger.error(e);
-    }
-});
-
-bot.on("messageUpdate", (oldM, newM) => {
-    try {
-        bot.events["messageUpdate"].forEach(e => e(oldM, newM));
-    } catch (e) {
-        bot.logger.error("Error in messageUpdate");
-        bot.logger.error(e);
-    }
-});
-
-bot.on("guildBanAdd", (guild, user) => {
-    try {
-        bot.events["guildBanAdd"].forEach(e => e(guild, user));
-    } catch (e) {
-        bot.logger.error("Error in guildBanAdd");
-        bot.logger.error(e);
-    }
-});
-
 //starboard
 bot.on("messageReactionAdd", (reaction, user) => {
     try {
@@ -461,3 +433,5 @@ bot.addEventListener = (event, func) => {
 
 //export the bot so other files can use it
 module.exports = bot;
+
+const eventHandler = require('./events');
