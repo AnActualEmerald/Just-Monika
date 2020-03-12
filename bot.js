@@ -154,6 +154,10 @@ bot.on("message", message => {
         return handleDM(message);
     }
 
+    if(message.content === "F"){
+        message.react('🇫');
+    }
+
     //TODO: Figure out what is actually happening here
     let guild = message.member.guild ? message.member.guild.id : 0;
 
@@ -166,6 +170,10 @@ bot.on("message", message => {
 
         let args = message.content.slice(prefix.length).split(/ +/);
         let cmdName = args.shift().toLowerCase();
+
+        if(cmdName === "" || cmdName === " "){
+            return;
+        }
 
         bot.logger.debug(args);
 
@@ -430,6 +438,12 @@ bot.addEventListener = (event, func) => {
         bot.logger.info(`Added listener for ${event}`);
     }
 };
+
+bot.removeEventListener = (event, func) => {
+    let i = bot.events[event].indexOf(func);
+    delete bot.events[event][i];
+    bot.logger.info(`Removed Listener for ${event}`);
+}
 
 //export the bot so other files can use it
 module.exports = bot;
