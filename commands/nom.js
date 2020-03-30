@@ -2,6 +2,7 @@ module.exports = {
     name: "nom",
     description: "Eats whatever you want, or a burrito by default",
     args: false,
+    cooldown: 1500,
     usage: "| <thing>",
     category: "Fun",
     execute(msg, args, bot) {
