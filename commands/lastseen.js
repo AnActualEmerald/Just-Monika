@@ -24,9 +24,14 @@ module.exports = {
                 if (online.includes(member.presence.status)) {
                     message.channel.send(`${member.displayName} is online`);
                 } else {
-                    message.channel.send(
-                        `${member.displayName}(${id}) last seen at ${users[id]}`
-                    );
+                    if (users[id])
+                        message.channel.send(
+                            `${member.displayName}(${id}) last seen at ${users[id]}`
+                        );
+                    else
+                        message.channel.send(
+                            `Don't know the last time ${member.displayName}(${id}) was around`
+                        );
                 }
             })
             .catch((e) => {
