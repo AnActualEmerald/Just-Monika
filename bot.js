@@ -105,27 +105,6 @@ bot.on("ready", () => {
 var thumbsdown = "👎";
 //end emojis
 
-bot.on("guildMemberAdd", member => {
-    const guildName = member.guild.id;
-    const channelName = bot.myGuilds[guildName].welcomeChannel;
-    const welcomeMsg = bot.myGuilds[guildName].welcomeMessage;
-    var channel;
-
-    try {
-        bot.logger.debug(`guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`);
-        channel = member.guild.channels.find("name", channelName);
-    } catch (err) {
-        bot.logger.error(`Couldn't get channel ${channelName}`);
-        bot.logger.error(err);
-    }
-
-    const result = welcomeMsg.interpolate({ user: member.user });
-
-    if (channel) {
-        channel.send(result);
-    }
-});
-
 bot.on("guildCreate", guild => {
     bot.myGuilds[guild.id] = {
         name: guild.name,
@@ -449,3 +428,25 @@ bot.removeEventListener = (event, func) => {
 module.exports = bot;
 
 const eventHandler = require('./events');
+
+//add events as needed
+bot.addEventListener("guildMemberAdd", member => {
+    const guildName = member.guild.id;
+    const channelName = bot.myGuilds[guildName].welcomeChannel;
+    const welcomeMsg = bot.myGuilds[guildName].welcomeMessage;
+    var channel;
+
+    try {
+        bot.logger.debug(`guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`);
+        channel = member.guild.channels.find("name", channelName);
+    } catch (err) {
+        bot.logger.error(`Couldn't get channel ${channelName}`);
+        bot.logger.error(err);
+    }
+
+    const result = welcomeMsg.interpolate({ user: member.user });
+
+    if (channel) {
+        channel.send(result);
+    }
+});

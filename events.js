@@ -52,3 +52,4 @@ client.on("guildMemberSpeaking", channel =>
 client.on("guildBanRemove", (guild, user) =>
     handle2Event("guildBanRemove", guild, user)
 );
+client.on("guildMemberAdd", (user) => handleEvent("guildMemberAdd", user));
