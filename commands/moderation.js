@@ -31,14 +31,7 @@ function load() {
         );
         embed.setDescription(message.content);
         embed.setTimestamp(time);
-
-        chanID = client.myGuilds[message.member.guild.id].logChannel;
-        channel = message.member.guild.channels.get(chanID);
-        if (channel) {
-            channel.send(embed);
-        } else {
-            client.logger.error("Moderation not setup for this server");
-        }
+        sendToLog(embed, message.member);
     });
 
     //log message edits
@@ -53,18 +46,13 @@ function load() {
         embed.setTimestamp(time);
         embed.setAuthor(oldM.member.displayName, oldM.author.avatarURL);
         embed.setFooter(oldM.id);
-        chanID = client.myGuilds[newM.member.guild.id].logChannel;
-        channel = newM.member.guild.channels.get(chanID);
-        if (channel) {
-            channel.send(embed);
-        } else {
-            client.logger.error("Moderation not setup for this server");
-        }
+        embed.setUrl(newM.url);
+        sendToLog(embed, newM.member);
     });
 
     //log bans
     client.addEventListener("guildBanAdd", (guild, user) => {
-        time = Date.now();
+        time =  Date.now();
         embed = new Discord.RichEmbed();
         embed.setTitle(`${user.tag} Banned`);
         embed.setColor("FF0000");
@@ -72,15 +60,46 @@ function load() {
         embed.setThumbnail(user.avatarURL);
         guild.fetchBan(user).then(info => {
             embed.setDescription(`${info.reason}`);
-            chanID = client.myGuilds[guild.id].logChannel;
-            channel = guild.channels.get(chanID);
-            if (channel) {
-                channel.send(embed);
-            } else {
-                client.logger.error("Moderation not setup for this server");
-            }
+            sendToLog(embed, user);
         });
+    });
+
+    //log user joins
+    client.addEventListener("guildMemberAdd", (member) => {
+        time = Date.now();
+        embed = new Discord.RichEmbed();
+        embed.setTitle(`${member.displayName} Joined!`);
+        embed.setColor("00FF00");
+        embed.setDescription(member.id);
+        embed.setTimestamp(time);
+        embed.setThumbnail(member.user.avatarURL);
+        embed.setFooter("Welcome to the server!");
+        sendToLog(embed, member);
+    });
+
+    //log user leaves
+    client.addEventListener("guildMemberRemove", (member) => {
+        time = Date.now();
+        embed = new Discord.RichEmbed();
+        embed.setTitle(`${member.displayName} Left!`);
+        embed.setColor("FF1010");
+        embed.setDescription(member.id);
+        embed.setTimestamp(time);
+        embed.setThumbnail(member.user.avatarURL);
+        embed.setFooter("See ya later!");
+        sendToLog(embed, member);
     });
 }
 //log users leaving and joining
 //TODO
+
+
+function sendToLog(embed, member){
+    chanID = client.myGuilds[member.guild.id].logChannel;
+    channel = member.guild.channels.get(chanID);
+    if (channel) {
+        channel.send(embed);
+    } else {
+        client.logger.error("Moderation not setup for this server");
+    }
+}
