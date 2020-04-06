@@ -11,7 +11,7 @@ module.exports = {
     execute(message, args, bot){
         if(args.length == 1){
             r = message.mentions.roles.first();
-            let embed = new Discord.RichEmbed();
+            let embed = new Discord.MessageEmbed();
             embed.setColor(r.hexColor);
             embed.setDescription(`Color: ${r.hexColor}`);
             message.channel.send(`Role color for ${r}`, {embed: embed});
@@ -20,7 +20,7 @@ module.exports = {
         if(args.length == 2){
             r = message.mentions.roles.first();
             r.setColor(`#${args[1]}`).then(update => {
-                let embed = new Discord.RichEmbed();
+                let embed = new Discord.MessageEmbed();
                 embed.setColor(update.hexColor);
                 embed.setDescription(`Color: ${update.hexColor}`);
                 

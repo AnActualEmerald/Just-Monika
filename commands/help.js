@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const {MessageEmbed} = require("discord.js");
 
 module.exports = {
     name: "help",
@@ -9,7 +9,7 @@ module.exports = {
     execute(message, args, bot) {
         let data = [];
         let guild = message.member.guild.id;
-        if (!args.length || message.mentions.channels.length > 0) {
+        if (!args.length || message.mentions.channels.size > 0) {
             var count = 0;
             var embeds = new Map();
 
@@ -21,7 +21,7 @@ module.exports = {
                 if (embeds.has(value.category)) {
                     embeds.get(value.category).addField(key, value.description);
                 } else {
-                    let tmp = new RichEmbed()
+                    let tmp = new MessageEmbed()
                         .setTitle(value.category)
                         .addField(key, value.description)
                         .setThumbnail(bot.user.avatarURL);
@@ -37,7 +37,7 @@ module.exports = {
 
             return data.forEach(val => {
                 if (
-                    message.mentions.channels.length > 0 &&
+                    message.mentions.channels.size > 0 &&
                     message.member.hasPermission("MANAGE_CHANNELS") //don't want plebs abusing this
                 ) {
                     message.mentions.channels.first().send(val);

@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const counters = ["1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣", "9⃣", "🔟"];
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
     category: "Utilities",
     execute(message, args, bot) {
         var options = args.join(" ").split(";");
-        var question = new RichEmbed()
+        var question = new MessageEmbed()
             .setTitle(
                 `${message.member.displayName} asks: ${options
                     .shift()

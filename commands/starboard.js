@@ -160,7 +160,7 @@ module.exports = {
                 var time = reaction.message.createdTimestamp;
                 client.logger.debug(`time ${time}`);
 
-                var result = new Discord.RichEmbed();
+                var result = new Discord.MessageEmbed();
 
                 result.setTimestamp(time);
                 result.setColor(author.displayColor);
