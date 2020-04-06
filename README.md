@@ -17,12 +17,15 @@ The most important file you'll need is a config.json in the root directory that 
 ```json
 {
 "token":"yourDiscordappToken",
-"prefix":"whateverYouWant",
 "debug":true,
 "winston_lvl":"debug"
 }
 ```
 
 As long as you have a config.json with the token, the bot should at least start for you.
+
+To enable the goodreads commands, you'll need some ```goodreads_key``` and ```goodreads_secret``` fields too.
+
+There are some other comands, like gitpull, that will need to be tweaked to work for you.
 
 Once you've got all of the JSON squared away, simply do `node ./bot.js` in the root directory and the bot should start right up. 
