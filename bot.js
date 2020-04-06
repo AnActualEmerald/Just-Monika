@@ -1,7 +1,7 @@
 ﻿var Discord = require("discord.js");
 var fs = require("fs");
 var Winston = require("winston");
-var util = require("util"); 
+var util = require("util");
 
 //file locations
 const guildFile = "./guilds.json";
@@ -59,13 +59,13 @@ bot.logger = Winston.createLogger({
     transports: [
         new Winston.transports.Console(),
         new Winston.transports.File({
-            filename: `info${today.getMonth()}-${today.getDate()}.log`
+            filename: `info${today.getMonth()}-${today.getDate()}.log`,
         }),
         new Winston.transports.File({
             filename: `debug_garbage${today.getMonth()}-${today.getDate()}.log`,
-            level: "silly"
-        })
-    ]
+            level: "silly",
+        }),
+    ],
 });
 
 var netLog = Winston.createLogger({
@@ -77,13 +77,13 @@ var netLog = Winston.createLogger({
     ),
     transports: [
         new Winston.transports.File({
-            filename: `network${today.getMonth()}-${today.getDate()}.log`
-        })
-    ]
+            filename: `network${today.getMonth()}-${today.getDate()}.log`,
+        }),
+    ],
 });
 
 //a little snippet taken from stack exchange (thanks Mateusz Moska)
-String.prototype.interpolate = function(params) {
+String.prototype.interpolate = function (params) {
     const names = Object.keys(params);
     const vals = Object.values(params);
     return new Function(...names, `return \`${this}\`;`)(...vals);
@@ -105,13 +105,13 @@ bot.on("ready", () => {
 var thumbsdown = "👎";
 //end emojis
 
-bot.on("guildCreate", guild => {
+bot.on("guildCreate", (guild) => {
     bot.myGuilds[guild.id] = {
         name: guild.name,
         prefix: "!",
         welcomeChannel: "general",
         welcomeMessage: "Welcome to the server, <@${user.id}>",
-        ignore: []
+        ignore: [],
     };
     updateJSON(guildFile, bot.myGuilds);
     guild.owner.send(
@@ -119,7 +119,7 @@ bot.on("guildCreate", guild => {
     );
 });
 
-bot.on("guildUpdate", guild => {
+bot.on("guildUpdate", (guild) => {
     try {
         bot.myGuilds[guild.id].name = guild.name;
     } catch (err) {
@@ -128,13 +128,13 @@ bot.on("guildUpdate", guild => {
     updateJSON(guildFile, bot.myGuilds);
 });
 
-bot.on("message", message => {
+bot.on("message", (message) => {
     if (message.channel.type === "dm") {
         return handleDM(message);
     }
 
-    if(message.content === "F"){
-        message.react('🇫');
+    if (message.content === "F") {
+        message.react("🇫");
     }
 
     //TODO: Figure out what is actually happening here
@@ -150,7 +150,7 @@ bot.on("message", message => {
         let args = message.content.slice(prefix.length).split(/ +/);
         let cmdName = args.shift().toLowerCase();
 
-        if(cmdName === "" || cmdName === " "){
+        if (cmdName === "" || cmdName === " ") {
             return;
         }
 
@@ -158,7 +158,9 @@ bot.on("message", message => {
 
         const com =
             bot.commands.get(cmdName) ||
-            bot.commands.find(cmd => cmd.alias && cmd.alias.includes(cmdName));
+            bot.commands.find(
+                (cmd) => cmd.alias && cmd.alias.includes(cmdName)
+            );
 
         let exe = com;
 
@@ -173,7 +175,7 @@ bot.on("message", message => {
                 return;
             } else {
                 bot.coolDowns.set(message.member.id, com.name);
-                setTimeout(function() {
+                setTimeout(function () {
                     bot.coolDowns.delete(message.member.id);
                 }, com.cooldown);
             }
@@ -189,7 +191,7 @@ bot.on("message", message => {
         //check perms
         var perms = [true];
         if (com.perms) {
-            perms = com.perms.map(val => {
+            perms = com.perms.map((val) => {
                 console.log(val);
                 if (val === "OWNER") {
                     if (message.author.id != 198606745034031104) {
@@ -230,14 +232,14 @@ bot.on("message", message => {
     updateJSON(guildFile, bot.myGuilds);
 });
 
-bot.on("disconnect", event => {
+bot.on("disconnect", (event) => {
     bot.logger.error("Websocket disconnected, code: " + event.code);
     bot.logger.error(event.reason);
     //bot.destroy();
     //bot.login(config.token);
 });
 
-bot.on("resume", replayed => {
+bot.on("resume", (replayed) => {
     //may not be necessary but I'm going to do this anyways
     bot.logger.warn("Resuming bot");
     bot.user.setActivity(bot.globalVar.activity);
@@ -246,7 +248,7 @@ bot.on("resume", replayed => {
 //event emitter mostly from https://discordjs.guide/popular-topics/reactions.html#emitting-the-event-s-yourself
 const events = {
     MESSAGE_REACTION_ADD: "messageReactionAdd",
-    MESSAGE_DELETE: "messageDelete"
+    MESSAGE_DELETE: "messageDelete",
 };
 bot.on("raw", (e, m) => {
     bot.logger.silly(`Event detected: ${util.inspect(e)}`);
@@ -280,7 +282,7 @@ bot.on("raw", (e, m) => {
         }
     } */
 
-    channel.fetchMessage(data.message_id || data.id).then(message => {
+    channel.fetchMessage(data.message_id || data.id).then((message) => {
         /*  switch (e.t) {
             case events.MESSAGE_DELETE: {
                 bot.emit(events[e.t], message);
@@ -299,23 +301,23 @@ bot.on("raw", (e, m) => {
 });
 
 //logging stuff
-bot.on("debug", info => {
+bot.on("debug", (info) => {
     netLog.info(info); //only logs to the network.log file
     bot.logger.verbose(info);
 });
 
-bot.on("warn", info => {
+bot.on("warn", (info) => {
     bot.logger.warn(info);
 });
 
-bot.on("error", info => {
+bot.on("error", (info) => {
     bot.logger.error(info);
 });
 
 //starboard
 bot.on("messageReactionAdd", (reaction, user) => {
     try {
-        bot.events["messageReactionAdd"].forEach(e => e(reaction, user));
+        bot.events["messageReactionAdd"].forEach((e) => e(reaction, user));
     } catch (e) {
         bot.logger.error("Error in messageReactionAdd");
         bot.logger.error(e);
@@ -324,7 +326,7 @@ bot.on("messageReactionAdd", (reaction, user) => {
 
 bot.on("messageReactionRemove", (reaction, user) => {
     try {
-        bot.events["messageReactionRemove"].forEach(e => e(reaction, user));
+        bot.events["messageReactionRemove"].forEach((e) => e(reaction, user));
     } catch (e) {
         bot.logger.error("Error in messageReactionRemove");
         bot.logger.error(e);
@@ -340,7 +342,7 @@ function updateJSON(fileName, data, cooked) {
         data = JSON.stringify(data);
     }
 
-    fs.writeFile(fileName, data, function(err) {
+    fs.writeFile(fileName, data, function (err) {
         if (err) {
             bot.logger.error("Error saving to JSON file");
             bot.logger.error(fileName);
@@ -354,7 +356,7 @@ function loadCmds(message) {
 
     const commandFiles = fs
         .readdirSync("./commands")
-        .filter(file => file.endsWith(".js"));
+        .filter((file) => file.endsWith(".js"));
 
     for (const file of commandFiles) {
         try {
@@ -379,7 +381,7 @@ function handleDM(message) {
     //do something here
 }
 
-bot.collectionToJSON = function(collection) {
+bot.collectionToJSON = function (collection) {
     var obj = {};
     var keys = collection.keyArray();
 
@@ -422,15 +424,15 @@ bot.removeEventListener = (event, func) => {
     let i = bot.events[event].indexOf(func);
     delete bot.events[event][i];
     bot.logger.info(`Removed Listener for ${event}`);
-}
+};
 
 //export the bot so other files can use it
 module.exports = bot;
 
-const eventHandler = require('./events');
+const eventHandler = require("./events");
 
 //add events as needed
-bot.addEventListener("guildMemberAdd", member => {
+bot.addEventListener("guildMemberAdd", (member) => {
     const guildName = member.guild.id;
     const channelName = bot.myGuilds[guildName].welcomeChannel;
     const welcomeMsg = bot.myGuilds[guildName].welcomeMessage;

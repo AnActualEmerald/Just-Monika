@@ -10,11 +10,11 @@ module.exports = {
     category: "Management",
     execute(message, args, bot) {
         pullRepo(message, bot);
-    }
+    },
 };
 
 function pullRepo(message, bot) {
     res = shell.exec("git pull origin master");
-    bot.logger.error("Gitpull ran with result: " + res);
+    bot.logger.info("Gitpull ran with result: " + res);
     message.channel.send(`Got this result: ${res}`);
 }
