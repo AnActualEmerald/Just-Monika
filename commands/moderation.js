@@ -22,7 +22,7 @@ function load() {
     //look for message deletions
     client.addEventListener("messageDelete", message => {
         time = Date.now();
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
         embed.setTitle(`Message Deleted In ${message.channel.name}`);
         embed.setColor(message.member.displayColor);
         embed.setAuthor(
@@ -38,7 +38,7 @@ function load() {
     client.addEventListener("messageUpdate", (oldM, newM) => {
         if (oldM.content === newM.content) return;
         time = Date.now();
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
         embed.setTitle(`Message Edited In ${oldM.channel.name}`);
         embed.addField("From", oldM.content);
         embed.addField("To", newM.content);
@@ -53,7 +53,7 @@ function load() {
     //log bans
     client.addEventListener("guildBanAdd", (guild, user) => {
         time =  Date.now();
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
         embed.setTitle(`${user.tag} Banned`);
         embed.setColor("FF0000");
         embed.setTimestamp(time);
@@ -67,7 +67,7 @@ function load() {
     //log user joins
     client.addEventListener("guildMemberAdd", (member) => {
         time = Date.now();
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
         embed.setTitle(`${member.displayName} Joined!`);
         embed.setColor("00FF00");
         embed.setDescription(member.id);
@@ -80,7 +80,7 @@ function load() {
     //log user leaves
     client.addEventListener("guildMemberRemove", (member) => {
         time = Date.now();
-        embed = new Discord.RichEmbed();
+        embed = new Discord.MessageEmbed();
         embed.setTitle(`${member.displayName} Left!`);
         embed.setColor("FF1010");
         embed.setDescription(member.id);

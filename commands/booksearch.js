@@ -57,7 +57,7 @@ async function search(message, q_string, bot) {
                 var url = b.book.link;
                 var title = b.book.title;
 
-                var embed = new Discord.RichEmbed();
+                var embed = new Discord.MessageEmbed();
                 embed.setTitle(`Goodreads search result for '${q_string}'`);
                 embed.setDescription(title);
                 embed.setURL(url);

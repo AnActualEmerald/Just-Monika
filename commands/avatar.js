@@ -10,7 +10,7 @@ module.exports = {
     execute(message, args, bot) {
         var user = message.mentions.users.first();
         var url = user.avatarURL;
-        var embed = new Discord.RichEmbed()
+        var embed = new Discord.MessageEmbed()
             .setTitle(user.username + "'s avatar")
             .setImage(url);
 
