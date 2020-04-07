@@ -56,3 +56,9 @@ client.on("guildMemberAdd", (user) => handleEvent("guildMemberAdd", user));
 client.on("presenceUpdate", (oldP, newP) =>
     handle2Event("presenceUpdate", oldP, newP)
 );
+client.on("messageReactionAdd", (reaction, user) =>
+    handle2Event("messageReactionAdd", reaction, user)
+);
+client.on("messageReactionRemove", (reaction, user) =>
+    handle2Event("messageReactionRemove", reaction, user)
+);
