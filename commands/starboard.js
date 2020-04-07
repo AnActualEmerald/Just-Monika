@@ -7,13 +7,18 @@ emoji = {
     args: true,
     description: "Change the emoji used for starboard detection",
     execute(message, args, bot) {
-        var emoji = args.shift();
-        bot.myGuilds[message.guild.id].star_emoji = emoji;
+        let e_raw = args.shift(); //have to do some processing to get the ID
+        let e_id = e_raw.startsWith("<")
+            ? e_raw.slice(e_raw.lastIndexOf(":") + 1, e_raw.indexOf(">"))
+            : e_raw;
+        client.logger.debug(`Emoji: ${e_raw}`);
+        var emoji = message.guild.emojis.resolve(e_id); //it would be cool if the emoji manager could resolve an emoji as it appears in the message
+        bot.myGuilds[message.guild.id].star_emoji = emoji ? emoji.name : e_id; //emoji manager also can't resolve unicode emoji
         bot.logger.info(
-            `Set starboard emoji for ${message.guild.name} to ${emoji.name}`
+            `Set starboard emoji for ${message.guild.name} to ${e_id}`
         );
-        message.channel.send(`Set starboard emoji to ${emoji}`);
-    }
+        message.channel.send(`Set starboard emoji to ${e_raw}`);
+    },
 };
 
 channel = {
@@ -35,7 +40,7 @@ channel = {
             );
             message.channel.send(`Starboard channel set to ${message.channel}`);
         }
-    }
+    },
 };
 
 threshold = {
@@ -50,7 +55,7 @@ threshold = {
             `Set starboard threshold in ${message.guild.name} to ${count}`
         );
         message.channel.send(`Starboard now requires ${count} reactions`);
-    }
+    },
 };
 
 ignore = {
@@ -62,9 +67,7 @@ ignore = {
 
         if (chan) {
             if (bot.myGuilds[message.guild.id].ignore.includes(chan)) {
-                var i = bot.myGuilds[message.guild.id].ignore.indexOf(
-                    chan.name
-                );
+                var i = bot.myGuilds[message.guild.id].ignore.indexOf(chan.id);
                 delete bot.myGuilds[message.guild.id].ignore[i];
                 bot.logger.info(`Enabled starboard for ${chan}`);
                 message.channel.send(`Enabled starboard in ${chan}`);
@@ -97,7 +100,7 @@ ignore = {
                 );
             }
         }
-    }
+    },
 };
 
 module.exports = {
@@ -109,7 +112,7 @@ module.exports = {
         emoji: emoji,
         channel: channel,
         ignore: ignore,
-        threshold: threshold
+        threshold: threshold,
     },
     args: true,
     usage: "<emoji|channel|ignore|threshold> <param>",
@@ -138,18 +141,17 @@ module.exports = {
             }
 
             var guildData = client.myGuilds[server.id];
-            if (guildData.ignore.includes(reaction.message.channel)) {
-                //woops lol
+            if (guildData.ignore.includes(reaction.message.channel.id)) {
+                client.logger.info("Channel ignored for starboard");
+                return;
             }
 
             if (
                 reaction.count >= guildData.star_lvl &&
-                reaction.emoji == guildData.star_emoji
+                reaction.emoji.name == guildData.star_emoji
             ) {
                 //do starboard stuff
-                var channel = server.channels.find(
-                    chan => chan.id === guildData.starboard_chan
-                );
+                var channel = server.channels.resolve(guildData.starboard_chan);
                 client.logger.debug(`Channel ${channel}`);
                 var author = reaction.message.member;
                 client.logger.debug(`Author ${author}`);
@@ -207,15 +209,15 @@ module.exports = {
                     );
                     var id = client.starredMsgs[reaction.message.id].star_id;
                     channel.messages
-                        .find(msg => msg.id === id)
+                        .find((msg) => msg.id === id)
                         .edit(`${reaction.emoji} #${reaction.count}`, result);
                     return;
                 } else {
                     channel
                         .send(`${reaction.emoji} #${reaction.count}`, result)
-                        .then(msg => {
+                        .then((msg) => {
                             client.starredMsgs[reaction.message.id] = {
-                                star_id: msg.id
+                                star_id: msg.id,
                             };
                         });
                 }
@@ -225,5 +227,5 @@ module.exports = {
 
             client.updateJSON(starFile, client.starredMsgs);
         });
-    }
+    },
 };

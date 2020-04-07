@@ -83,7 +83,7 @@ var netLog = Winston.createLogger({
 });
 
 //a little snippet taken from stack exchange (thanks Mateusz Moska)
-String.prototype.interpolate = function (params) {
+String.prototype.interpolate = function(params) {
     const names = Object.keys(params);
     const vals = Object.values(params);
     return new Function(...names, `return \`${this}\`;`)(...vals);
@@ -115,7 +115,8 @@ bot.on("guildCreate", (guild) => {
     };
     updateJSON(guildFile, bot.myGuilds);
     guild.owner.send(
-        `Hey there, I just joined your server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use ${bot.prefix}help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. You can change this and the message I send using ${bot.prefix}welcomechannel and ${bot.prefix}welcomemsg. I look forward to memeing with you!`
+        `Hey there, I just joined your server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use !help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. ` +
+            `You can change this and the message I send using !welcomechannel and !welcomemsg. If you want to change the prefix my commands use, do !prefix I look forward to memeing with you!`
     );
 });
 
@@ -175,7 +176,7 @@ bot.on("message", (message) => {
                 return;
             } else {
                 bot.coolDowns.set(message.member.id, com.name);
-                setTimeout(function () {
+                setTimeout(function() {
                     bot.coolDowns.delete(message.member.id);
                 }, com.cooldown);
             }
@@ -185,6 +186,8 @@ bot.on("message", (message) => {
         if (com.subcommands) {
             if (com.subcommands[args[0]]) {
                 exe = com.subcommands[args.shift()];
+                //and check to see if the subcommand has special perms
+                if (exe.perms) com = exe; //this way the perms check will use the sub command rather than the base command
             }
         }
 
@@ -195,7 +198,7 @@ bot.on("message", (message) => {
                 console.log(val);
                 if (val === "OWNER") {
                     if (message.author.id != 198606745034031104) {
-                        //change this if you cloned this bot
+                        //^change this if you cloned this bot^
                         message.reply(
                             "You don't have permission to use this command"
                         );
@@ -226,8 +229,8 @@ bot.on("message", (message) => {
 
     bot.userVars[message.author] = parseInt(bot.userVars[message.author]) + 1;
 
+    //TODO: Replace json files with an SQL database for scalability. Maybe look into using firebase?
     updateJSON(usersFile, bot.userVars);
-
     updateJSON(varFile, bot.globalVar);
     updateJSON(guildFile, bot.myGuilds);
 });
@@ -246,23 +249,26 @@ bot.on("resume", (replayed) => {
 });
 
 //event emitter mostly from https://discordjs.guide/popular-topics/reactions.html#emitting-the-event-s-yourself
-const events = {
+const raw_events = {
     MESSAGE_REACTION_ADD: "messageReactionAdd",
     MESSAGE_DELETE: "messageDelete",
 };
 bot.on("raw", (e, m) => {
+    //this whole thing is broken
     bot.logger.silly(`Event detected: ${util.inspect(e)}`);
     bot.logger.silly(`Anything?: ${util.inspect(m)}`);
-    if (!events.hasOwnProperty(e.t)) return; //check to see if the event is MESSAGE_REACTION_ADD
+    if (!raw_events.hasOwnProperty(e.t)) return; //check to see if the event is MESSAGE_REACTION_ADD
     const data = e.d;
     bot.logger.silly(`Data = ${util.inspect(data)}`);
-    const user = bot.users.get(data.user_id);
+    const user = bot.users.resolve(data.user_id);
     bot.logger.silly(`User = ${util.inspect(user)}`);
-    const channel = bot.channels.get(data.channel_id);
+    const channel = bot.channels.resolve(data.channel_id);
     bot.logger.silly(`Channel = ${util.inspect(channel)}`);
 
-    if (channel.messages.has(data.message_id)) return; //prevent double emission
+    if (channel.messages.cache.has(data.message_id)) return; //prevent double emission
     /* 
+    //This code doesn't work because getting the message that was deleted from the raw even doesn't seem to work
+    
     switch (e.t) {
         case events.MESSAGE_DELETE: {
             channel.fetchMessage(data.id).then(msg => {
@@ -282,27 +288,23 @@ bot.on("raw", (e, m) => {
         }
     } */
 
-    channel.fetchMessage(data.message_id || data.id).then((message) => {
-        /*  switch (e.t) {
+    message = channel.messages.resolve(data.message_id); // <------ can no longer get messages from out of cache due to changes in discord.js
+    /*  switch (e.t) {
             case events.MESSAGE_DELETE: {
                 bot.emit(events[e.t], message);
             }
             case events.MESSAGE_REACTION_ADD: { */
-        const emojiKey = data.emoji.id
-            ? `${data.emoji.name}:${data.emoji.id}`
-            : data.emoji.name;
+    const emojiKey = data.emoji.id ? data.emoji.id : data.emoji.name;
 
-        const reaction = message.reactions.get(emojiKey);
-
-        bot.emit(events[e.t], reaction, user);
-        // }
-        //}
-    });
+    const reaction = message.reactions.resolve(emojiKey);
+    bot.emit(raw_events[e.t], reaction, user);
+    // }
+    //}
 });
 
 //logging stuff
 bot.on("debug", (info) => {
-    netLog.info(info); //only logs to the network.log file
+    netLog.info(info); //only logs to the network.log file. Should mostly be heartbeats
     bot.logger.verbose(info);
 });
 
@@ -313,25 +315,7 @@ bot.on("warn", (info) => {
 bot.on("error", (info) => {
     bot.logger.error(info);
 });
-
-//starboard
-bot.on("messageReactionAdd", (reaction, user) => {
-    try {
-        bot.events["messageReactionAdd"].forEach((e) => e(reaction, user));
-    } catch (e) {
-        bot.logger.error("Error in messageReactionAdd");
-        bot.logger.error(e);
-    }
-});
-
-bot.on("messageReactionRemove", (reaction, user) => {
-    try {
-        bot.events["messageReactionRemove"].forEach((e) => e(reaction, user));
-    } catch (e) {
-        bot.logger.error("Error in messageReactionRemove");
-        bot.logger.error(e);
-    }
-});
+//Don't really intend to move these to events.js as I don't thing there are many uses for them aside from logging
 
 //functions
 
@@ -342,7 +326,7 @@ function updateJSON(fileName, data, cooked) {
         data = JSON.stringify(data);
     }
 
-    fs.writeFile(fileName, data, function (err) {
+    fs.writeFile(fileName, data, function(err) {
         if (err) {
             bot.logger.error("Error saving to JSON file");
             bot.logger.error(fileName);
@@ -381,7 +365,7 @@ function handleDM(message) {
     //do something here
 }
 
-bot.collectionToJSON = function (collection) {
+bot.collectionToJSON = function(collection) {
     var obj = {};
     var keys = collection.keyArray();
 
@@ -429,7 +413,7 @@ bot.removeEventListener = (event, func) => {
 //export the bot so other files can use it
 module.exports = bot;
 
-const eventHandler = require("./events");
+const eventHandler = require("./events.js");
 
 //add events as needed
 bot.addEventListener("guildMemberAdd", (member) => {
