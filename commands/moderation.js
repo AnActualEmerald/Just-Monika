@@ -12,15 +12,16 @@ module.exports = {
         bot.myGuilds[message.member.guild.id].logChannel = message.channel.id;
         message.channel
             .send("Set up logging in this channel")
-            .then(m => m.delete(2000));
+            .then((m) => m.delete({ timeout: 2000 }));
         bot.updateJSON("../guilds.json", bot.myGuilds);
     },
-    load: load
+    load: load,
 };
 
 function load() {
     //look for message deletions
-    client.addEventListener("messageDelete", message => {
+    client.addEventListener("messageDelete", (message) => {
+        client.logger.debug("This happened");
         time = Date.now();
         embed = new Discord.MessageEmbed();
         embed.setTitle(`Message Deleted In ${message.channel.name}`);
@@ -46,19 +47,20 @@ function load() {
         embed.setTimestamp(time);
         embed.setAuthor(oldM.member.displayName, oldM.author.avatarURL);
         embed.setFooter(oldM.id);
-        embed.setUrl(newM.url);
+        embed.setURL(newM.url);
         sendToLog(embed, newM.member);
     });
 
     //log bans
+
     client.addEventListener("guildBanAdd", (guild, user) => {
-        time =  Date.now();
+        time = Date.now();
         embed = new Discord.MessageEmbed();
         embed.setTitle(`${user.tag} Banned`);
         embed.setColor("FF0000");
         embed.setTimestamp(time);
         embed.setThumbnail(user.avatarURL);
-        guild.fetchBan(user).then(info => {
+        guild.fetchBan(user).then((info) => {
             embed.setDescription(`${info.reason}`);
             sendToLog(embed, user);
         });
@@ -93,10 +95,9 @@ function load() {
 //log users leaving and joining
 //TODO
 
-
-function sendToLog(embed, member){
+function sendToLog(embed, member) {
     chanID = client.myGuilds[member.guild.id].logChannel;
-    channel = member.guild.channels.get(chanID);
+    channel = member.guild.channels.resolve(chanID);
     if (channel) {
         channel.send(embed);
     } else {
