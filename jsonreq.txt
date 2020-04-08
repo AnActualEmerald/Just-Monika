@@ -4,7 +4,7 @@ lastseen.json
 messages.json
 config.json
 guilds.json
-reactgroups.json
+commands/reactgroups.json
 commands/customCommands.json
 commands/cmdVars.json
 commands/pasta.json
