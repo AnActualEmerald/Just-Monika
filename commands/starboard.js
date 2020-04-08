@@ -209,7 +209,7 @@ module.exports = {
                     );
                     var id = client.starredMsgs[reaction.message.id].star_id;
                     channel.messages
-                        .find((msg) => msg.id === id)
+                        .fetch((msg) => msg.id === id)
                         .edit(`${reaction.emoji} #${reaction.count}`, result);
                     return;
                 } else {
