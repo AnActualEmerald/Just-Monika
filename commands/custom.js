@@ -46,7 +46,7 @@ add = {
 list = {
     execute(message, args, bot) {
         Discord = require("discord.js");
-        var embed = new Discord.RichEmbed().setTitle("Custom Commands: ");
+        var embed = new Discord.MessageEmbed().setTitle("Custom Commands: ");
         var keys = bot.customComs.keyArray();
         var c = [];
         console.log(keys);

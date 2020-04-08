@@ -1,4 +1,4 @@
-const {MessageEmbed} = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 
 module.exports = {
     name: "help",
@@ -35,14 +35,14 @@ module.exports = {
                 `You can send \`${bot.myGuilds[guild].prefix}help [command name]\` to get info on a specific command!`
             );
 
-            return data.forEach(val => {
+            return data.forEach((val) => {
                 if (
                     message.mentions.channels.size > 0 &&
                     message.member.hasPermission("MANAGE_CHANNELS") //don't want plebs abusing this
                 ) {
                     message.mentions.channels.first().send(val);
                 } else {
-                    message.author.send(val).catch(error => {
+                    message.author.send(val).catch((error) => {
                         bot.logger.error(
                             `Could not send help DM to ${message.author.tag}.\n`,
                             error
@@ -65,7 +65,13 @@ module.exports = {
             data.push(`Aliases: ${alias}`);
 
             if (com.cooldown) data.push(`Cool-down: ${com.cooldown / 1000}s`);
-
+            if (com.subcommands) {
+                let sub = [];
+                for (c in com.subcommands) {
+                    sub.push(c);
+                }
+                data.push(`Subcommands: ${sub.join(", ")}`);
+            }
             data.push(`${details}`);
 
             return message.author
@@ -74,7 +80,7 @@ module.exports = {
                     if (message.channel.type === "dm") return;
                     message.reply(`I\'ve sent you a DM about ${com.name}`);
                 })
-                .catch(error => {
+                .catch((error) => {
                     bot.logger.error(
                         `Could not send help DM to ${message.author.tag}.\n`,
                         error
@@ -84,5 +90,5 @@ module.exports = {
                     );
                 });
         }
-    }
+    },
 };
