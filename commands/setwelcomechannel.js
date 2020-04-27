@@ -10,11 +10,11 @@ module.exports = {
     category: "Management",
     execute(message, args, bot) {
         var guildName = message.member.guild.id;
-        bot.myGuilds[guildName].welcomeChannel = message.channel.name;
+        bot.myGuilds[guildName].welcomeChannel = message.channel.id;
         message.channel
             .send(
                 `Welcome messages will now be sent to ${message.channel.name}`
             )
-            .then(message => message.delete(5000));
-    }
+            .then((message) => message.delete({ timeout: 5000 }));
+    },
 };

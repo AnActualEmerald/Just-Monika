@@ -59,7 +59,7 @@ function load() {
         embed.setTitle(`${user.tag} Banned`);
         embed.setColor("FF0000");
         embed.setTimestamp(time);
-        embed.setThumbnail(user.avatarURL);
+        embed.setThumbnail(user.avatarURL());
         guild.fetchBan(user).then((info) => {
             embed.setDescription(`${info.reason}`);
             sendToLog(embed, user);
@@ -79,6 +79,40 @@ function load() {
         sendToLog(embed, member);
     });
 
+    //send the welcome message
+    client.addEventListener("guildMemberAdd", (member) => {
+        const guildName = member.guild.id;
+        const channelName = client.myGuilds[guildName].welcomeChannel;
+        const welcomeMsg = client.myGuilds[guildName].welcomeMessage;
+        var channel;
+
+        try {
+            client.logger.debug(
+                `guildMemberAdd: cn ${channelName} wm ${welcomeMsg}`
+            );
+            channel = member.guild.channels.resolve(channelName);
+        } catch (err) {
+            client.logger.error(`Couldn't get channel ${channelName}`);
+            client.logger.error(err);
+        }
+
+        const result = welcomeMsg.interpolate({ user: member.user });
+
+        if (channel) {
+            channel.send(result);
+        } else {
+            chanID = client.myGuilds[member.guild.id].logChannel;
+            channel = member.guild.channels.resolve(chanID);
+            if (channel) {
+                channel.send(
+                    `Tried to send welcome message, but the channel was ${channel}`
+                );
+            } else {
+                client.logger.error("Moderation not setup for this server");
+            }
+        }
+    });
+
     //log user leaves
     client.addEventListener("guildMemberRemove", (member) => {
         time = Date.now();
@@ -87,12 +121,12 @@ function load() {
         embed.setColor("FF1010");
         embed.setDescription(member.id);
         embed.setTimestamp(time);
-        embed.setThumbnail(member.user.avatarURL);
+        embed.setThumbnail(member.user.avatarURL());
         embed.setFooter("See ya later!");
         sendToLog(embed, member);
     });
 }
-//log users leaving and joining
+
 //TODO
 
 function sendToLog(embed, member) {

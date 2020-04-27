@@ -12,18 +12,18 @@ module.exports = {
             .replace("<@", "")
             .replace("!", "")
             .replace(">", "");
-        var user = message.member.guild.members.get(userID);
+        var user = message.member.guild.members.resolve(userID);
         var reason = args.join(" ");
 
         user.kick(reason)
             .then(() =>
                 message.channel.send(`Kicked <@${userID}> for \`${reason}\``)
             )
-            .catch(err => {
+            .catch((err) => {
                 bot.logger.error(`Error kicking ${user.user.username}: ${err}`);
                 message.channel.send(
                     `COULD'T KICK <@${userID}>, THEY'RE TOO POWERFUL`
                 );
             });
-    }
+    },
 };
