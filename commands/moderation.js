@@ -21,18 +21,27 @@ module.exports = {
 function load() {
     //look for message deletions
     client.addEventListener("messageDelete", (message) => {
-        client.logger.debug("This happened");
-        time = Date.now();
-        embed = new Discord.MessageEmbed();
-        embed.setTitle(`Message Deleted In ${message.channel.name}`);
-        embed.setColor(message.member.displayColor);
-        embed.setAuthor(
-            message.member.displayName,
-            message.member.user.avatarURL
-        );
-        embed.setDescription(message.content);
-        embed.setTimestamp(time);
-        sendToLog(embed, message.member);
+        if (message.member) {
+            time = Date.now();
+            embed = findEmbeds(message);
+            embed.setTitle(`Message Deleted In ${message.channel.name}`);
+            embed.setColor(message.member.displayColor);
+            embed.setAuthor(
+                message.member.displayName,
+                message.member.user.avatarURL()
+            );
+            embed.setDescription(message.content);
+            embed.setTimestamp(time);
+            sendToLog(embed, message.member);
+        } else {
+            time = Date.now();
+            embed = findEmbeds(message);
+            embed.setTitle(`Message Deleted In ${message.channel.name}`);
+            embed.setColor("f60011");
+            embed.setDescription(message.content);
+            embed.setTimestamp(time);
+            sendToLog(embed, message.member);
+        }
     });
 
     //log message edits
@@ -137,4 +146,39 @@ function sendToLog(embed, member) {
     } else {
         client.logger.error("Moderation not setup for this server");
     }
+}
+
+function findEmbeds(message) {
+    let result = new Discord.MessageEmbed();
+    var e = message.embeds[0];
+    if (e) {
+        client.logger.debug(`Found an embed ${e}`);
+        // if (e.title) result.setTitle(e.title);
+
+        if (e.thumbnail) result.setThumbnail(e.thumbnail.url);
+
+        if (e.description) result.setDescription(e.description);
+
+        if (e.footer) result.setFooter(e.footer.text);
+
+        if (e.author) result.setAuthor(e.author.name, e.author.icon);
+
+        if (e.color) result.setColor(e.color);
+
+        if (e.image) result.setImage(e.image.url);
+
+        if (e.file) result.attachFile(e.file);
+
+        if (e.files) result.attachFiles(e.files);
+
+        if (e.url) result.setURL(e.url);
+    }
+
+    var att = message.attachments.first();
+    if (att) {
+        client.logger.debug(`Found an attachment ${att}`);
+        result.setImage(att.url);
+    }
+
+    return result;
 }

@@ -25,7 +25,7 @@ const myFormat = Winston.format.printf(
 var today = new Date();
 
 //create bot
-var bot = new Discord.Client();
+var bot = new Discord.Client({ partials: ["MESSAGE"] });
 
 //bot methods
 bot.JSONtoCollection = JSONtoCollection;
@@ -43,7 +43,7 @@ bot.auth = config.token;
 bot.gr_key = config.goodreads_key;
 bot.gr_secret = config.goodreads_secret;
 bot.ccFile = ccFile;
-bot.events = {};
+bot.event_listeners = {};
 bot.starredMsgs = require(starFile);
 bot.hugs = 0;
 
@@ -253,54 +253,55 @@ const raw_events = {
     MESSAGE_REACTION_ADD: "messageReactionAdd",
     MESSAGE_DELETE: "messageDelete",
 };
-bot.on("raw", (e, m) => {
-    //this whole thing is broken
-    bot.logger.silly(`Event detected: ${util.inspect(e)}`);
-    bot.logger.silly(`Anything?: ${util.inspect(m)}`);
-    if (!raw_events.hasOwnProperty(e.t)) return; //check to see if the event is MESSAGE_REACTION_ADD
-    const data = e.d;
-    bot.logger.silly(`Data = ${util.inspect(data)}`);
-    const user = bot.users.resolve(data.user_id);
-    bot.logger.silly(`User = ${util.inspect(user)}`);
-    const channel = bot.channels.resolve(data.channel_id);
-    bot.logger.silly(`Channel = ${util.inspect(channel)}`);
 
-    if (channel.messages.cache.has(data.message_id)) return; //prevent double emission
-    /* 
-    //This code doesn't work because getting the message that was deleted from the raw even doesn't seem to work
-    
-    switch (e.t) {
-        case events.MESSAGE_DELETE: {
-            channel.fetchMessage(data.id).then(msg => {
-                bot.emit(events[e.t], msg);
-            });
-        }
-        case events.MESSAGE_REACTION_ADD: {
-            channel.fetchMessage(data.message_id).then(message => {
-                const emojiKey = data.emoji.id
-                    ? `${data.emoji.name}:${data.emoji.id}`
-                    : data.emoji.name;
+// bot.on("raw", (e, m) => {
+//     //this whole thing is broken
+//     bot.logger.silly(`Event detected: ${util.inspect(e)}`);
+//     bot.logger.silly(`Anything?: ${util.inspect(m)}`);
+//     if (!raw_events.hasOwnProperty(e.t)) return; //check to see if the event is MESSAGE_REACTION_ADD
+//     const data = e.d;
+//     bot.logger.silly(`Data = ${util.inspect(data)}`);
+//     const user = bot.users.resolve(data.user_id);
+//     bot.logger.silly(`User = ${util.inspect(user)}`);
+//     const channel = bot.channels.resolve(data.channel_id);
+//     bot.logger.silly(`Channel = ${util.inspect(channel)}`);
 
-                const reaction = message.reactions.get(emojiKey);
+//     if (channel.messages.cache.has(data.message_id)) return; //prevent double emission
+//     /*
+//     //This code doesn't work because getting the message that was deleted from the raw even doesn't seem to work
 
-                bot.emit(events[e.t], reaction, user);
-            });
-        }
-    } */
+//     switch (e.t) {
+//         case events.MESSAGE_DELETE: {
+//             channel.fetchMessage(data.id).then(msg => {
+//                 bot.emit(events[e.t], msg);
+//             });
+//         }
+//         case events.MESSAGE_REACTION_ADD: {
+//             channel.fetchMessage(data.message_id).then(message => {
+//                 const emojiKey = data.emoji.id
+//                     ? `${data.emoji.name}:${data.emoji.id}`
+//                     : data.emoji.name;
 
-    message = channel.messages.resolve(data.message_id); // <------ can no longer get messages from out of cache due to changes in discord.js
-    /*  switch (e.t) {
-            case events.MESSAGE_DELETE: {
-                bot.emit(events[e.t], message);
-            }
-            case events.MESSAGE_REACTION_ADD: { */
-    const emojiKey = data.emoji.id ? data.emoji.id : data.emoji.name;
+//                 const reaction = message.reactions.get(emojiKey);
 
-    const reaction = message.reactions.resolve(emojiKey);
-    bot.emit(raw_events[e.t], reaction, user);
-    // }
-    //}
-});
+//                 bot.emit(events[e.t], reaction, user);
+//             });
+//         }
+//     } */
+
+//     message = channel.messages.resolve(data.message_id); // <------ can no longer get messages from out of cache due to changes in discord.js
+//     /*  switch (e.t) {
+//             case events.MESSAGE_DELETE: {
+//                 bot.emit(events[e.t], message);
+//             }
+//             case events.MESSAGE_REACTION_ADD: { */
+//     const emojiKey = data.emoji.id ? data.emoji.id : data.emoji.name;
+
+//     const reaction = message.reactions.resolve(emojiKey);
+//     bot.emit(raw_events[e.t], reaction, user);
+//     // }
+//     //}
+// });
 
 //logging stuff
 bot.on("debug", (info) => {
@@ -395,26 +396,21 @@ bot.login(config.token);
 bot.updateJSON = updateJSON;
 
 bot.addEventListener = (event, func) => {
-    if (bot.events[event]) {
-        bot.events[event].push(func);
+    if (bot.event_listeners[event]) {
+        bot.event_listeners[event].push(func);
         bot.logger.info(`Created listener for ${event}`);
     } else {
-        bot.events[event] = [func];
+        bot.event_listeners[event] = [func];
         bot.logger.info(`Added listener for ${event}`);
     }
 };
 
 bot.removeEventListener = (event, func) => {
-    let i = bot.events[event].indexOf(func);
-    delete bot.events[event][i];
+    let i = bot.event_listeners[event].indexOf(func);
+    delete bot.event_listeners[event][i];
     bot.logger.info(`Removed Listener for ${event}`);
 };
 
 //export the bot so other files can use it
 module.exports = bot;
 require("./events.js");
-
-//add events as needed
-bot.on("messageDelete", (message) => {
-    bot.logger.debug("A message was deleted: " + message.id);
-});

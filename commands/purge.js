@@ -9,11 +9,11 @@ module.exports = {
         count = args.shift();
         channel = message.channel;
 
-        channel
-            .fetchMessages({ before: message.id, limit: count })
-            .then(col => {
+        channel.messages
+            .fetch({ before: message.id, limit: count })
+            .then((col) => {
                 channel.bulkDelete(col);
                 message.delete();
             });
-    }
+    },
 };
