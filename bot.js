@@ -337,7 +337,7 @@ function updateJSON(fileName, data, cooked) {
 }
 
 function loadCmds(message) {
-    bot.events = {};
+    bot.event_listeners = {};
 
     const commandFiles = fs
         .readdirSync("./commands")

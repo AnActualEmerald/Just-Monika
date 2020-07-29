@@ -2,7 +2,7 @@ const client = require("./bot.js");
 
 function handle2Event(event, param1, param2) {
     try {
-        client.events[event].forEach((e) => e(param1, param2));
+        client.event_listeners[event].forEach((e) => e(param1, param2));
     } catch (e) {
         client.logger.error(`Error in ${event}`);
         client.logger.error(e);
@@ -11,7 +11,7 @@ function handle2Event(event, param1, param2) {
 
 function handleEvent(event, param1) {
     try {
-        client.events[event].forEach((e) => e(param1));
+        client.event_listeners[event].forEach((e) => e(param1));
     } catch (e) {
         client.logger.error(`Error in ${event}`);
         client.logger.error(e);

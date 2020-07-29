@@ -26,7 +26,7 @@ channel = {
     args: true,
     description: "Change the channel starboard messages are sent to",
     execute(message, args, bot) {
-        var chan = args.shift();
+        var chan = message.mentions.channels.first();
         if (chan) {
             bot.myGuilds[message.guild.id].starboard_chan = chan.id;
             bot.logger.info(
