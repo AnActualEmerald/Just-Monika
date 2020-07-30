@@ -9,17 +9,22 @@ module.exports = {
             bot.logger.debug(`command msgcount: `);
 
             message.channel
-                .send(args + " has sent " + bot.userVars[args] + " messages")
+                .send(
+                    args +
+                        " has sent " +
+                        bot.userVars[args].msg_count +
+                        " messages"
+                )
                 .catch(console.err);
         } else {
             message.channel
                 .send(
                     message.author +
                         " you've sent " +
-                        bot.userVars[message.author] +
+                        bot.userVars[message.author].msg_count +
                         " messages"
                 )
                 .catch(console.err);
         }
-    }
+    },
 };
