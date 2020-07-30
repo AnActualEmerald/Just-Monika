@@ -33,6 +33,7 @@ bot.updateJSON = updateJSON;
 bot.loadCmds = loadCmds;
 
 //initialize bot
+bot.userFile = usersFile;
 bot.myGuilds = require(guildFile);
 bot.commands = new Discord.Collection();
 bot.coolDowns = new Discord.Collection();
@@ -139,7 +140,7 @@ bot.on("message", (message) => {
     }
 
     //TODO: Figure out what is actually happening here
-    let guild = message.member.guild ? message.member.guild.id : 0;
+    let guild = message.member.guild ? message.guild.id : 0;
 
     if (message.author.bot || guild == 0) return;
 
@@ -224,10 +225,11 @@ bot.on("message", (message) => {
     }
 
     if (!bot.userVars[message.author]) {
-        bot.userVars[message.author] = 0;
+        bot.userVars[message.author] = {};
     }
 
-    bot.userVars[message.author] = parseInt(bot.userVars[message.author]) + 1;
+    bot.userVars[message.author].msg_count =
+        parseInt(bot.userVars[message.author].msg_count) + 1;
 
     //TODO: Replace json files with an SQL database for scalability. Maybe look into using firebase?
     updateJSON(usersFile, bot.userVars);
