@@ -34,6 +34,7 @@ bot.loadCmds = loadCmds;
 
 //initialize bot
 bot.userFile = usersFile;
+bot.guildFile = guildFile;
 bot.myGuilds = require(guildFile);
 bot.commands = new Discord.Collection();
 bot.coolDowns = new Discord.Collection();
@@ -84,7 +85,7 @@ var netLog = Winston.createLogger({
 });
 
 //a little snippet taken from stack exchange (thanks Mateusz Moska)
-String.prototype.interpolate = function(params) {
+String.prototype.interpolate = function (params) {
     const names = Object.keys(params);
     const vals = Object.values(params);
     return new Function(...names, `return \`${this}\`;`)(...vals);
@@ -177,7 +178,7 @@ bot.on("message", (message) => {
                 return;
             } else {
                 bot.coolDowns.set(message.member.id, com.name);
-                setTimeout(function() {
+                setTimeout(function () {
                     bot.coolDowns.delete(message.member.id);
                 }, com.cooldown);
             }
@@ -274,7 +275,7 @@ function updateJSON(fileName, data, cooked) {
         data = JSON.stringify(data);
     }
 
-    fs.writeFile(fileName, data, function(err) {
+    fs.writeFile(fileName, data, function (err) {
         if (err) {
             bot.logger.error("Error saving to JSON file");
             bot.logger.error(fileName);
@@ -313,7 +314,7 @@ function handleDM(message) {
     //do something here
 }
 
-bot.collectionToJSON = function(collection) {
+bot.collectionToJSON = function (collection) {
     var obj = {};
     var keys = collection.keyArray();
 

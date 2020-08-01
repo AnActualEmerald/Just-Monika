@@ -154,7 +154,10 @@ module.exports = {
                 }
 
                 var guildData = client.myGuilds[server.id];
-                if (guildData.ignore.includes(reaction.message.channel.id)) {
+                if (
+                    guildData.ignore &&
+                    guildData.ignore.includes(reaction.message.channel.id)
+                ) {
                     client.logger.info("Channel ignored for starboard");
                     return;
                 }
