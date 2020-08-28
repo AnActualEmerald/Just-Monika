@@ -20,6 +20,14 @@ set = {
     },
 };
 
+streak = {
+    name: "streak",
+    args: false,
+    execute(message, args, bot) {
+        let duo = getDuoObj(message, bot);
+    },
+};
+
 module.exports = {
     name: "duo",
     args: true,
@@ -30,20 +38,7 @@ module.exports = {
     },
     category: "Utilities",
     execute(message, args, bot) {
-        let user_id = bot.userVars[message.author].duo_id;
-        let prefix = bot.myGuilds[message.guild.id].prefix;
-        if (!user_id) {
-            message.channel.send(
-                `I don't have an accoount for you! Have you done ${prefix}duo set <username> yet?`
-            );
-
-            return;
-        }
-
-        let cred = {
-            id: `${user_id}`,
-        };
-        let duo = new Duolingo(cred);
+        let duo = getDuoObj(message, bot);
 
         getMyFields(duo)
             .then((data) => {
@@ -84,4 +79,25 @@ async function getMyFields(duo) {
     ];
 
     return await duo.getDataByFields(fields);
+}
+
+async function getMyFields(duo, fields) {
+    return await duo.getDataByFields(fields);
+}
+
+function getDuoObj(message, bot) {
+    let user_id = bot.userVars[message.author].duo_id;
+    let prefix = bot.myGuilds[message.guild.id].prefix;
+    if (!user_id) {
+        message.channel.send(
+            `I don't have an accoount for you! Have you done ${prefix}duo set <username> yet?`
+        );
+
+        return;
+    }
+
+    let cred = {
+        id: `${user_id}`,
+    };
+    return new Duolingo(cred);
 }
