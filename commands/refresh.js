@@ -1,5 +1,4 @@
 const { MessageFlags } = require("discord.js");
-
 module.exports = {
     name: "refresh",
     alias: ["ref", "reset"],
@@ -11,6 +10,10 @@ module.exports = {
     category: "Management",
     execute(message, args, bot) {
         let guildID = message.guild.id;
+
+        bot.database.removeGuild(guildID, bot.logger);
+        bot.database.addGuild(message.guild, bot.logger);
+
         bot.myGuilds[guildID] = {
             name: message.guild.name,
             prefix: "!",

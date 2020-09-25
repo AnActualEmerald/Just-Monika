@@ -28,13 +28,23 @@ channel = {
     execute(message, args, bot) {
         var chan = message.mentions.channels.first();
         if (chan) {
-            bot.myGuilds[message.guild.id].starboard_chan = chan.id;
+            bot.database.setGuildProp(
+                message.guild.id,
+                "starboard_chan",
+                chan.id,
+                bot.logger
+            );
             bot.logger.info(
                 `Set starboard channel for ${message.guild.name} to ${chan.id}`
             );
             message.channel.send(`Starboard channel set to ${chan}`);
         } else {
-            bot.myGuilds[message.guild.id].starboard_chan = message.channel.id;
+            bot.database.setGuildProp(
+                message.guild.id,
+                "starboard_chan",
+                message.channel.id,
+                bot.logger
+            );
             bot.logger.info(
                 `Set starborad channel for ${message.guild.name} to ${message.channel.name}`
             );
@@ -50,7 +60,12 @@ threshold = {
         "Sets the number of reactions needed to make it to the starboard",
     execute(message, args, bot) {
         var count = args.shift();
-        bot.myGuilds[message.guild.id].star_lvl = count;
+        bot.database.setGuildProp(
+            message.guild.id,
+            "star_lvl",
+            count,
+            bot.logger
+        );
         bot.logger.info(
             `Set starboard threshold in ${message.guild.name} to ${count}`
         );
@@ -62,17 +77,32 @@ ignore = {
     name: "ignore",
     args: true,
     description: "Make the bot ignore a channel for starboard reactions",
-    execute(message, args, bot) {
+    async execute(message, args, bot) {
         var chan = args.shift();
+        let ignoreArray = await bot.database.getGuildProp(
+            message.guild.id,
+            "ignore",
+            bot.logger
+        );
 
+        bot.logger.info(ignoreArray);
         if (chan) {
-            if (bot.myGuilds[message.guild.id].ignore.includes(chan)) {
-                var i = bot.myGuilds[message.guild.id].ignore.indexOf(chan.id);
-                delete bot.myGuilds[message.guild.id].ignore[i];
+            if (ignoreArray.includes(chan)) {
+                bot.database.removeGuildArrayProp(
+                    message.guild.id,
+                    "ignore",
+                    chan.id,
+                    bot.logger
+                );
                 bot.logger.info(`Enabled starboard for ${chan}`);
                 message.channel.send(`Enabled starboard in ${chan}`);
             } else {
-                bot.myGuilds[message.guild.id].ignore.push(chan);
+                bot.database.setGuildArrayProp(
+                    message.guild.id,
+                    "ignore",
+                    chan,
+                    bot.logger
+                );
                 bot.logger.info(
                     `Starboard disabled for ${message.guild.name} channel ${message.channel}`
                 );
@@ -80,9 +110,9 @@ ignore = {
             }
         } else {
             if (
-                bot.myGuilds[message.guild.id].ignore.includes(
-                    message.channel.id
-                )
+                bot.database
+                    .getGuildProp(message.guild.id, "ignore", bot.logger)
+                    .includes(message.channel.id)
             ) {
                 var i = bot.myGuilds[message.guild.id].ignore.indexOf(
                     message.channel.id

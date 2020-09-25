@@ -2,6 +2,7 @@
 var fs = require("fs");
 var Winston = require("winston");
 var util = require("util");
+var db = require("./database.js");
 
 //file locations
 const guildFile = "./guilds.json";
@@ -92,6 +93,10 @@ String.prototype.interpolate = function (params) {
 };
 
 bot.on("ready", () => {
+    if (db) {
+        bot.database = db;
+    }
+
     loadCmds();
 
     fs.readdir("./commands/data/hugs", (err, files) => {
@@ -108,14 +113,7 @@ var thumbsdown = "👎";
 //end emojis
 
 bot.on("guildCreate", (guild) => {
-    bot.myGuilds[guild.id] = {
-        name: guild.name,
-        prefix: "!",
-        welcomeChannel: "general",
-        welcomeMessage: "Welcome to the server, <@${user.id}>",
-        ignore: [],
-    };
-    updateJSON(guildFile, bot.myGuilds);
+    db.addGuild(guild, bot.logger);
     guild.owner.send(
         `Hey there, I just joined your server, ${guild.name}! I'm a perhaps not so helpful bot to have around, but I do my best. Use !help to learn about my commands. For now,	I'm set to welcome new users in your #general channel if you have one. ` +
             `You can change this and the message I send using !welcomechannel and !welcomemsg. If you want to change the prefix my commands use, do !prefix I look forward to memeing with you!`
@@ -123,15 +121,11 @@ bot.on("guildCreate", (guild) => {
 });
 
 bot.on("guildUpdate", (guild) => {
-    try {
-        bot.myGuilds[guild.id].name = guild.name;
-    } catch (err) {
-        bot.logger.error(err);
-    }
-    updateJSON(guildFile, bot.myGuilds);
+    db.updateGuild(guild, bot.logger);
 });
 
-bot.on("message", (message) => {
+bot.on("message", async (message) => {
+    bot.logger.info(message);
     if (message.channel.type === "dm") {
         return handleDM(message);
     }
@@ -145,7 +139,8 @@ bot.on("message", (message) => {
 
     if (message.author.bot || guild == 0) return;
 
-    let prefix = bot.myGuilds[guild].prefix;
+    let prefix = await db.getGuildProp(guild, "prefix", bot.logger);
+    console.log(prefix);
     //listen for commands starting with the prefix
     if (message.content.startsWith(prefix)) {
         bot.logger.info("Command string: " + message.content);
@@ -360,5 +355,9 @@ bot.removeEventListener = (event, func) => {
 };
 
 //export the bot so other files can use it
-module.exports = bot;
+module.exports = {
+    on: bot.on,
+    addEventListener: bot.addEventListener,
+    database: db,
+};
 require("./events.js");

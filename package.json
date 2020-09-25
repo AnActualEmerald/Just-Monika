@@ -6,6 +6,7 @@
     "author": "Emerald",
     "repository": "http://github.com/AnActualEmerald/Just-Monika,git",
     "dependencies": {
+        "bson": "^4.1.0",
         "discord.js": "^12.2.0",
         "duolingo-api": "^1.0.2",
         "goodreads-api-node": "0.0.12",
