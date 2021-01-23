@@ -12,7 +12,7 @@
         "jimp": "^0.14.0",
         "lodash": "^4.17.19",
         "log-timestamp": "^0.3.0",
-        "npm": "^6.14.7",
+        "npm": "^7.4.3",
         "package.json": "^2.0.1",
         "shelljs": "^0.8.4",
         "winston": "^3.3.3",
