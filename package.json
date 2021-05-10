@@ -10,7 +10,7 @@
         "duolingo-api": "^1.0.2",
         "goodreads-api-node": "0.0.12",
         "jimp": "^0.14.0",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "log-timestamp": "^0.3.0",
         "npm": "^7.4.3",
         "package.json": "^2.0.1",
