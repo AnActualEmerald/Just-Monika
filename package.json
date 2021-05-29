@@ -16,7 +16,7 @@
         "package.json": "^2.0.1",
         "shelljs": "^0.8.4",
         "winston": "^3.3.3",
-        "ws": "^7.2.3",
+        "ws": "^7.4.6",
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
