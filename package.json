@@ -14,7 +14,7 @@
         "log-timestamp": "^0.3.0",
         "npm": "^7.4.3",
         "package.json": "^2.0.1",
-        "shelljs": "^0.8.4",
+        "shelljs": "^0.8.5",
         "winston": "^3.3.3",
         "ws": "^7.2.3",
         "xml2js": "^0.4.23"
